@@ -1,4 +1,4 @@
-app.controller('userController', ['$scope', '$window', '$location', '$cookies', 'messageFactory', 'userFactory', function($scope, $window, $location, $cookies, messageFactory, userFactory){
+app.controller('userController', ['$scope', '$window', '$location', '$cookies', 'messageFactory', 'userFactory', 'subforumFactory', function($scope, $window, $location, $cookies, messageFactory, userFactory, subforumFactory){
 
 	if($cookies.get("activeUser") == null || $cookies.get("activeUser") == undefined){
 		$window.location.href = "http://localhost:8080/Podforum/#/login";
@@ -12,14 +12,75 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	$scope.emptyInbox = false;
 	
 	$scope.message = {	"sender" : $scope.activeUser.username, "receiver" : "", "content" : "", "read" : false }
+	$scope.newSub = { "name" : "", "description" : "", "responibleModerator" : $scope.activeUser.username}
 	$scope.viewInbox = false;
 	$scope.newMessage = false;
 	$scope.editProfile = false;
+	$scope.viewSubforum = false;
+	$scope.newSubforum = false;
 	
+	$scope.goToSubforum = function() {
+		$scope.viewInbox = false;
+		$scope.newMessage = false;
+		$scope.editProfile = false;
+		$scope.viewSubforum = true;
+		$scope.newSubforum = false;
+	}
+	$scope.noviForum = function() {
+		$scope.viewInbox = false;
+		$scope.newMessage = false;
+		$scope.editProfile = false;
+		$scope.viewSubforum = false;
+		$scope.newSubforum = true;
+	}
+	
+	$scope.setFileEventListener = function(element) {
+        $scope.uploadedFile = element.files[0];
+        if ($scope.uploadedFile) {
+            $scope.$apply(function() {
+                $scope.upload_button_state = true;
+            });   
+        }
+    }
+	$scope.uploadFile = function() {
+		uploadFile();
+	};
+
+	function uploadFile() {
+		if (!$scope.uploadedFile) {
+			return;
+		}
+		if($scope.newSubforum.name != null && $scope.name != ""){
+			subforumFactory.upload($scope.uploadedFile, $scope.name);
+		}else{
+			toast('Morate uneti naziv podforuma');
+		}
+	}
+	$scope.saveSubforum = function() {
+		if($scope.newSub.name == null){
+			toast('Morate uneti naziv podforuma');
+		}else if($scope.newSub.description == null){
+			toast('Morate uneti opis podforuma');
+		}else{
+			subforumFactory.saveSubforum($scope.newSub).success(function(data){
+				toast(data);
+			});
+		}
+	}
+	$scope.cancelSubforum = function() {
+		$scope.viewInbox = false;
+		$scope.newMessage = false;
+		$scope.editProfile = false;
+		$scope.viewSubforum = true;
+		$scope.newSubforum = false;
+	}
 	$scope.editUser = function() {
+		$scope.viewSubforum = false;
+		$scope.newSubforum = false;
 		$scope.viewInbox = false;
 		$scope.newMessage = false;
 		$scope.editProfile = true;
+		$scope.viewSubforum = false;
 		userFactory.getUsers($scope.activeUser.username).success(function(data){
 			$scope.users = data;
 		});
@@ -31,7 +92,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	
 	$scope.changeRole = function(username, role){
 		userFactory.editRole(username, role).success(function(data){
-			
+			toast(data);
 		});
 		for(i = 0; i < $scope.users.length; i++){
 			if($scope.users[i].username == username)
@@ -62,6 +123,9 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	} 	 
 	
 	$scope.goToInbox = function() {
+		$scope.viewSubforum = false;
+		$scope.newSubforum = false;
+		$scope.viewSubforum = false;
 		$scope.editProfile = false;
 		$scope.viewInbox = true;
 		$scope.newMessage = false;
@@ -75,6 +139,9 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	}
 
 	$scope.novaPoruka = function() {
+		$scope.viewSubforum = false;
+		$scope.newSubforum = false;
+		$scope.viewSubforum = false;
 		$scope.editProfile = false;
 		$scope.viewInbox = false;
 		$scope.newMessage = true;
@@ -103,6 +170,9 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		}
 	}
 	$scope.cancel = function() {
+		$scope.viewSubforum = false;
+		$scope.newSubforum = false;
+		$scope.viewSubforum = false;
 		$scope.editProfile = false;
 		$scope.viewInbox = true;
 		$scope.newMessage = false;
@@ -113,6 +183,9 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$scope.posaljiDugme = true;
 	}
 	$scope.odgovori = function(messageInbox){
+		$scope.viewSubforum = false;
+		$scope.newSubforum = false;
+		$scope.viewSubforum = false;
 		$scope.editProfile = false;
 		$scope.posaljiDugme = true;
 		$scope.viewInbox = false;
@@ -122,6 +195,9 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$scope.content = null;
 	}
 	$scope.detalji = function(messageInbox){
+		$scope.viewSubforum = false;
+		$scope.newSubforum = false;
+		$scope.viewSubforum = false;
 		$scope.editProfile = false;
 		messageInbox.read = true;
 		messageFactory.read(messageInbox);
@@ -152,7 +228,6 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 			return false;
 	}
 }]);
-
 
 app.controller('loginController', [ '$scope', '$location', '$cookies', '$localStorage', 'loginService', 'registrationService', 'userFactory',  function($scope, $location, $cookies, $localStorage, loginService, registrationService, userFactory){
 	$scope.errorMessage = false;	

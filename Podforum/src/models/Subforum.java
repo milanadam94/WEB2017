@@ -8,11 +8,22 @@ public class Subforum {
 	private String description;
 	private String iconPath;
 	private ArrayList<String> rules;
-	private User responibleModerator;
+	private String responibleModerator;
 	private ArrayList<User> moderators;
 	
 	public Subforum() {
 		super();
+	}
+
+	public Subforum(String name, String description, String iconPath, ArrayList<String> rules, String responibleModerator,
+			ArrayList<User> moderators) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.iconPath = iconPath;
+		this.rules = rules;
+		this.responibleModerator = responibleModerator;
+		this.moderators = moderators;
 	}
 
 	public String getName() {
@@ -47,11 +58,11 @@ public class Subforum {
 		this.rules = rules;
 	}
 
-	public User getResponibleModerator() {
+	public String getResponibleModerator() {
 		return responibleModerator;
 	}
 
-	public void setResponibleModerator(User responibleModerator) {
+	public void setResponibleModerator(String responibleModerator) {
 		this.responibleModerator = responibleModerator;
 	}
 

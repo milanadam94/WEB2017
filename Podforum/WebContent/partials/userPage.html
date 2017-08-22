@@ -1,16 +1,16 @@
 <head>
 	<style>
-		#newMessage {
+		#newMessage, #newSubforum {
 		  position: absolute;
 		  top: 50%;
 		  left: 50%;
 		  margin: -150px 0 0 -150px;
 		}
+		
 	</style>
 </head>
 
 <div ng-controller="userController">
-	
 	<nav class="navbar navbar-inverse">
   		<div class="container-fluid">
     		<div class="navbar-header">
@@ -18,7 +18,7 @@
     		</div>
     		<ul class="nav navbar-nav">
       			<li class="active"><a href="">Entiteti</a></li>
-      			<li><a href="">Podforumi</a></li>
+      			<li><a href="" ng-click="goToSubforum()" ng-if=!isUser()>Podforumi</a></li>
       			<li><a href="">Like/Dislike</a></li>
       			<li><a href="" ng-click="goToInbox()">Poruke</a></li>
       			<li><a href="" ng-click="editUser()" ng-if="isAdministrator()">Promena tipa</a></li>
@@ -28,9 +28,49 @@
 			</ul>
     	</div>
 	</nav>
-	
-	<div ng-show="viewInbox">
+	<div ng-show="viewSubforum">
+		<div>
+			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="noviForum()">Kreiranje foruma</button><br><br>
+		</div>
+	</div>
+	<div ng-show="newSubforum" id="newSubforum">
+		<div class="form-group">
+			<label class="control-label"> Naziv: </label>  
+			<input type = "text" class="form-control" id="name" ng-model="newSub.name" placeholder="Unesite naziv podforuma"> 
+		</div>
+		<div class="form-group">	
+			<label class="control-label"> Opis: </label>  
+			<textarea rows="2" cols="50" class="form-control" ng-model="newSub.description" placeholder="Unesite opis podforuma"></textarea>
+		</div>
 		
+		<div class="form-group">
+	        <div class="fileupload fileupload-new" data-provides="fileupload">
+	            <div class="input-append">
+	                <div class="uneditable-input span3">
+	                    <i class="icon-file fileupload-exists"></i> 
+	                    <span class="fileupload-preview" ng-model="userType"></span>                                          
+	                </div>                                
+	                <span class="btn btn-file">
+	                    <span class="fileupload-new">Izaberite ikonicu</span>
+	                    <input type="file" ng-model="upFile" onchange="angular.element(this).scope().setFileEventListener(this)" />
+	                </span>
+	           
+	            </div>
+	        </div>                   
+    	</div>
+	    <div class="form-group"  >
+	        <button type="submit"  value="Send" id="btnStartUpload" class="btn start" ng-click="uploadFile()" ng-disabled="!upload_button_state">
+	            <i class="icon-upload"></i>
+	            <span>Upload File</span>
+	        </button>                       
+	    </div>
+	    <div class="form-group">	
+			<button type="submit" class="btn btn-primary" ng-click="saveSubforum()"> Sacuvaj </button>
+			<button type="submit" class="btn btn-second pull-right" ng-click="cancelSubforum()"> Zatvori </button>
+		</div>
+    
+	</div>
+	<div ng-show="viewInbox">		
 		<div>
 			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="novaPoruka()">Nova poruka</button><br><br>
 		</div>
@@ -53,7 +93,6 @@
 			</table>
 		</div>  
 		<div class="form-group text-danger" ng-if="emptyInbox">{{ emptyInbox }}</div>
-
 	</div>
 	
 	<div ng-show="newMessage" id="newMessage">
@@ -69,8 +108,7 @@
 			<button type="submit" class="btn btn-primary" ng-click="send()" ng-show="posaljiDugme"> Posalji </button>
 			<button type="submit" class="btn btn-second pull-right" ng-click="cancel()"> Zatvori </button>
 		</div>
-	</div>
-	
+	</div>	
 	<div ng-show="editProfile">
 		<div class="col-md-12">
 			<label><font color="blue" size="3">Registrovani korisnici:</font></label>
@@ -92,7 +130,6 @@
 			</table>
 		</div> 
 	</div>
-	
 	<div id="profileModal" class="modal fade" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">

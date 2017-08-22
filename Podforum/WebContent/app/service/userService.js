@@ -19,6 +19,6 @@ app.factory('userFactory', function($http){
 	factory.editRole = function(username, role) {
 		return $http.post('/Podforum/rest/user/changeRole/' + username + '/' + role);
 	}
-	
+ 
 	return factory;
 });
