@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+	<meta charset="UTF-8">
+	<title>Podforum</title>
+
+	<!-- JQUERY -->
+	<script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+
+
+	<link href="css/toast.css" rel="stylesheet" />
+	<link href="css/bootstrap.css" rel="stylesheet" />
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  	<script src="js/jquery.min.js"></script>
+	<script src="js/angular.js"></script>
+	<script src="js/angular-route.js"></script>
+	<script src="js/angular-animate.js"></script>
+	
+	<script src="js/toast.js"></script>
+	<script src="js/ui-bootstrap-tpls-1.3.3.js"></script>
+	<script src="js/ng-file-upload-shim.js"></script> <!-- for no html5 browsers support -->
+	<script src="js/ng-file-upload.js"></script>
+	<script src="js/bs-table.min.js"></script>
+	
+	<script src="app/app.js"></script>
+	
+	<script src="app/controller/userController.js"></script>
+	<script src="app/controller/messageController.js"></script>
+	<script src="app/controller/homeController.js"></script>
+	
+	<script src="app/service/userService.js"></script>
+	<script src="app/service/messageService.js"></script>
+	
+	<!--  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>-->
+  	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+  	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
+	<!-- Angular Material Library -->
+	<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.10/ngStorage.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-cookies.js"></script>
+</head>
+<body>
+	<div layout="column" class="relative" layout-fill role="main">
+		<div ng-view></div>
+	</div>
+</body>
+</html>

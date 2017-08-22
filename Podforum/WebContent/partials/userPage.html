@@ -1,0 +1,72 @@
+<head>
+	<style>
+		#newMessage {
+		  position: absolute;
+		  top: 50%;
+		  left: 50%;
+		  margin: -150px 0 0 -150px;
+		}
+	</style>
+</head>
+
+<div ng-controller="userController">
+	
+	<nav class="navbar navbar-inverse">
+  		<div class="container-fluid">
+    		<div class="navbar-header">
+      			<a class="navbar-brand" href="">Pocetna</a>
+    		</div>
+    		<ul class="nav navbar-nav">
+      			<li class="active"><a href="">Entiteti</a></li>
+      			<li><a href="">Podforumi</a></li>
+      			<li><a href="">Like/Dislike</a></li>
+      			<li><a href="" ng-click="goToInbox()">Poruke</a></li>
+    		</ul>
+    		<ul class="nav navbar-nav navbar-right">
+			      <li><a href="" ng-click="logout()">Odjava</a></li>
+			</ul>
+    	</div>
+	</nav>
+	
+	<div ng-show="viewInbox">
+		
+		<div>
+			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="novaPoruka()">Nova poruka</button><br><br>
+		</div>
+		<div class="col-md-12" ng-show="showTableInbox">
+			<label><font color="blue" size="3">Primljene poruke:</font></label>
+			<table class="table table-bordered table-striped">
+				    <thead>
+				      <tr>
+				        <th>Pošiljalac</th><th>Poruka</th><th>Detalji</th><th>Odgovori</th>
+				      </tr>
+				     </thead>
+				     <tbody>
+				     	<tr ng-repeat="messageInbox in inbox">
+				     		<td > {{ messageInbox.sender }} </td>
+				     		<td ng-if="messageInbox.read == false" style="background:red" > {{ messageInbox.content }} </td>
+				     		<td ng-if="messageInbox.read == true" style="background:lightgreen" > {{ messageInbox.content }} </td>
+				     		<td> <button type="submit" class="btn btn-info" ng-click="detalji(messageInbox)">Detalji</button> </td>
+				     		<td> <button type="submit" class="btn btn-warning" ng-click="odgovori(messageInbox)">Odgovori</button></td>
+				     </tbody>
+			</table>
+		</div>  
+		<div class="form-group text-danger" ng-if="emptyInbox">{{ emptyInbox }}</div>
+
+	</div>
+	
+	<div ng-show="newMessage" id="newMessage">
+		<div class="form-group">
+			<label for="receiver" class="control-label"> Primalac: </label>  
+			<input type = "text" class="form-control" id="receiver" ng-model="receiver" ng-disabled="receiverDisabled" placeholder="Unesite korisničko ime primaoca"> 
+		</div>
+		<div class="form-group">	
+			<label for="content" class="control-label"> Poruka: </label>  
+			<textarea rows="4" cols="50" class="form-control" ng-model="content" ng-disabled="contentDisabled" placeholder="Unesite sadrzaj poruke"></textarea>
+		</div>
+		<div class="form-group">	
+			<button type="submit" class="btn btn-primary" ng-click="send()" ng-show="posaljiDugme"> Posalji </button>
+			<button type="submit" class="btn btn-second pull-right" ng-click="cancel()"> Zatvori </button>
+		</div>
+	</div>
+</div>

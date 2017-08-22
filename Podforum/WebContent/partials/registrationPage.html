@@ -1,0 +1,50 @@
+<head>
+	<style>
+		#registration {
+		  position: absolute;
+		  top: 50%;
+		  left: 20%;
+		  margin: -150px 0 0 -150px;
+		}
+	</style>
+</head>
+
+<div class="container-fluid">
+	<div class="jumbotron">
+		<h1>Registracija</h1>
+	</div>
+	<div ng-controller="registrationController" id="registration">
+		<div class="form-group">
+			<label for="text" class="control-label"> Korisničko ime: </label>  
+			<input type = "text" required class="form-control" id="username" ng-model="user.username" placeholder="Unesite korisničko ime"> 
+		</div>
+		<div class="form-group">	
+			<label for="password" class="control-label"> Lozinka: </label>  
+			<input type = "password" required class="form-control" id="password" ng-model="user.password" placeholder="Unesite lozinku"> 
+		</div>
+		<div class="form-group">	
+			<label for="confirmPassword" class="control-label"> Potvrda lozinke: </label>  
+			<input type = "password" required class="form-control" id="confirmPassword" ng-model="passwordConfirm" placeholder="Potvrdite lozinku"> 
+		</div>
+		<div class="form-group">	
+			<label for="name" class="control-label"> Ime: </label>  
+			<input type = "text" required class="form-control" id="name" ng-model="user.name" placeholder="Unesite ime"> 
+		</div>
+		<div class="form-group">	
+			<label for="lastName" class="control-label"> Prezime: </label>  
+			<input type = "text" required class="form-control" id="lastName" ng-model="user.surname" placeholder="Unesite prezime"> 
+		</div>
+		<div class="form-group">	
+			<label for="email" class="control-label"> Email: </label>  
+			<input type = "email" required class="form-control" id="email" ng-model="user.email" placeholder="Unesite email"> 
+		</div>
+		<div class="form-group">	
+			<label for="phone" class="control-label"> Kontakt telefon: </label>  
+			<input type = "text" required class="form-control" id="phone" ng-model="user.phoneNumber" placeholder="Unesite kontakt telefon"> 
+		</div>
+		<div class="form-group text-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+		<div class="form-group">	
+			<button type="submit" class="btn btn-primary" ng-click="register()"> Registracija </button>
+		</div>
+	</div>
+</div>
