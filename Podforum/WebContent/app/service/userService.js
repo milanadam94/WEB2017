@@ -12,5 +12,13 @@ app.factory('userFactory', function($http){
 		     												"role":user.role, "registrationDate":user.registrationDate});
 	}
 	
+	factory.getUsers = function(username) {
+		return $http.get('/Podforum/rest/user/getUsers/'+username);
+	}
+	
+	factory.editRole = function(username, role) {
+		return $http.post('/Podforum/rest/user/changeRole/' + username + '/' + role);
+	}
+	
 	return factory;
 });

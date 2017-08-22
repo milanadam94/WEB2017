@@ -21,6 +21,7 @@
       			<li><a href="">Podforumi</a></li>
       			<li><a href="">Like/Dislike</a></li>
       			<li><a href="" ng-click="goToInbox()">Poruke</a></li>
+      			<li><a href="" ng-click="editUser()" ng-if="isAdministrator()">Promena tipa</a></li>
     		</ul>
     		<ul class="nav navbar-nav navbar-right">
 			      <li><a href="" ng-click="logout()">Odjava</a></li>
@@ -69,4 +70,60 @@
 			<button type="submit" class="btn btn-second pull-right" ng-click="cancel()"> Zatvori </button>
 		</div>
 	</div>
+	
+	<div ng-show="editProfile">
+		<div class="col-md-12">
+			<label><font color="blue" size="3">Registrovani korisnici:</font></label>
+			<table class="table table-bordered table-striped">
+				    <thead>
+				      <tr>
+				        <th>Korisničko ime</th><th>Ime</th><th>Prezime</th><th>Email</th><th>Uloga</th><th>Izmena</th>
+				      </tr>
+				     </thead>
+				     <tbody>
+				     	<tr ng-repeat="user in users">
+				     		<td> {{ user.username}} </td>
+				     		<td> {{ user.name }}</td>
+				     		<td> {{ user.surname }}</td>
+				     		<td> {{ user.email }}</td>
+				     		<td> {{ user.role }}</td>
+				     		<td> <button type="submit" class="btn btn-info" data-toggle="modal" data-target="#profileModal" ng-click="editRole(user)">Izmeni</button> </td>
+				     </tbody>
+			</table>
+		</div> 
+	</div>
+	
+	<div id="profileModal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+			        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+			        	<h4 class="modal-title">Promena tipa</h4>
+			      	</div>
+			      	<div class="modal-body">
+			      		<div class="form-group">
+							<label class="control-label" for="username">Korisničko ime:</label>
+							<input type="text" class="form-control" id="username" ng-model="editModal.username" disabled>
+						</div>
+						<div class="form-group">
+							<label class="control-label" for="name">Ime:</label>
+							<input type="text" class="form-control" id="name" ng-model="editModal.name" disabled>
+						</div>
+						<div class="form-group">
+							<label class="control-label" for="name">Uloga:</label>
+							<select class="form-control" ng-model="editModal.role">
+								<option value="USER" ng-if="!isRoleUser(editModal.role)">KORISNIK</option>
+								<option value="MODERATOR" ng-ig="!isRoleModerator(editModal.role)">MODERATOR</option>
+								<option value="ADMINISTRATOR" ng-if="!isRoleAdmin(editModal.role)">ADMINISTRATOR</option>
+							</select>
+						</div>
+						
+			      	</div>
+			      	<div class="modal-footer">
+			      		<button type="button" class="btn btn-primary" data-dismiss="modal">Izađi</button>
+			        	<button type="submit" class="btn btn-primary pull-left" data-dismiss="modal" ng-click="changeRole(editModal.username, editModal.role)" > Izmeni </button>
+			      	</div>
+				</div>
+			</div>
+		</div>
 </div>

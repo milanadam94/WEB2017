@@ -15,6 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import fileControllers.UserFileController;
+import models.Role;
 import models.User;
 
 @Path("/user")
@@ -41,6 +42,19 @@ public class UserController {
 		return "Korisnik uspesno registrovan";
 	}
 	
+	@POST
+	@Path("/changeRole/{username}/{role}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String changeRole(@PathParam(value="username") String username, @PathParam(value="role") String role) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		for (User user : users) {
+			if(user.getUsername().equals(username)){
+				user.setRole(Role.valueOf(role));
+			}
+		}
+		UserFileController.writeUser(config, users);
+		return "Promenjen tip korisnika";
+	}
 	@GET
 	@Path("/getUser/{username}/{password}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -51,5 +65,20 @@ public class UserController {
 				return user;
 		}
 		return null;
+	}
+	
+	@GET
+	@Path("/getUsers/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<User> getUsers(@PathParam(value="username") String username) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		ArrayList<User> sendUsers = new ArrayList<>();
+ 		for (User user : users) {
+			if(user.getUsername().equals(username))
+				System.out.println("Jaa");
+			else
+				sendUsers.add(user);
+		}
+		return sendUsers;
 	}
 }

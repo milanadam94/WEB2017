@@ -1,48 +1,81 @@
-app.controller('userController', ['$scope', '$window', '$location', '$cookies', 'messageFactory', function($scope, $window, $location, $cookies, messageFactory){
+app.controller('userController', ['$scope', '$window', '$location', '$cookies', 'messageFactory', 'userFactory', function($scope, $window, $location, $cookies, messageFactory, userFactory){
 
-	//$scope.activeUser = $cookies.getObject("activeUser");
-	//console.log($scope.activeUser);
 	if($cookies.get("activeUser") == null || $cookies.get("activeUser") == undefined){
 		$window.location.href = "http://localhost:8080/Podforum/#/login";
 	}else{
 		$scope.activeUser = $cookies.getObject("activeUser");
-		//console.log($scope.activeUser);
 	}
+	
 	$scope.inbox = [];
-	$scope.sent = [];
+	$scope.users = [];
 	$scope.showTableInbox = true;
 	$scope.emptyInbox = false;
 	
-	messageFactory.inbox($scope.activeUser.username).success(function(data){
-		$scope.inbox = data;
-		console.log($scope.inbox)
-		if($scope.inbox.length == 0){
-			$scope.showTableInbox = false;
-			$scope.emptyInbox = "Nema primljenih poruka."
-		}
-	});
-	
-	$scope.message = {
-			"sender" : $scope.activeUser.username,
-			"receiver" : "",
-			"content" : "",
-			"read" : false
-	}
-	
+	$scope.message = {	"sender" : $scope.activeUser.username, "receiver" : "", "content" : "", "read" : false }
 	$scope.viewInbox = false;
 	$scope.newMessage = false;
+	$scope.editProfile = false;
 	
+	$scope.editUser = function() {
+		$scope.viewInbox = false;
+		$scope.newMessage = false;
+		$scope.editProfile = true;
+		userFactory.getUsers($scope.activeUser.username).success(function(data){
+			$scope.users = data;
+		});
+	}
+	
+	$scope.editRole = function(user) {
+		$scope.editModal = { "username" : user.username, "name" : user.name, "role" : user.role };
+	}
+	
+	$scope.changeRole = function(username, role){
+		userFactory.editRole(username, role).success(function(data){
+			
+		});
+		for(i = 0; i < $scope.users.length; i++){
+			if($scope.users[i].username == username)
+				$scope.users[i].role = role;
+		}
+	}
+	$scope.isRoleUser = function(role){
+		if(role == "USER")
+			return true;
+		else 
+			return false
+	}
+	$scope.isRoleAdmin = function(role){
+		if(role == "ADMINISTRATOR")
+			return true;
+		else 
+			return false
+	}
+	$scope.isRoleModerator = function(role){
+		if(role == "MODERATOR")
+			return true;
+		else 
+			return false
+	}
 	$scope.logout = function() {
 		$cookies.remove("activeUser");
 		$location.path('/login');
 	} 	 
 	
 	$scope.goToInbox = function() {
+		$scope.editProfile = false;
 		$scope.viewInbox = true;
 		$scope.newMessage = false;
+		messageFactory.inbox($scope.activeUser.username).success(function(data){
+			$scope.inbox = data;
+			if($scope.inbox.length == 0){
+				$scope.showTableInbox = false;
+				$scope.emptyInbox = "Nema primljenih poruka."
+			}
+		});
 	}
 
 	$scope.novaPoruka = function() {
+		$scope.editProfile = false;
 		$scope.viewInbox = false;
 		$scope.newMessage = true;
 		$scope.posaljiDugme = true;
@@ -70,6 +103,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		}
 	}
 	$scope.cancel = function() {
+		$scope.editProfile = false;
 		$scope.viewInbox = true;
 		$scope.newMessage = false;
 		$scope.receiver = null;
@@ -79,6 +113,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$scope.posaljiDugme = true;
 	}
 	$scope.odgovori = function(messageInbox){
+		$scope.editProfile = false;
 		$scope.posaljiDugme = true;
 		$scope.viewInbox = false;
 		$scope.newMessage = true;
@@ -87,6 +122,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$scope.content = null;
 	}
 	$scope.detalji = function(messageInbox){
+		$scope.editProfile = false;
 		messageInbox.read = true;
 		messageFactory.read(messageInbox);
 		$scope.viewInbox = false;
@@ -97,22 +133,35 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$scope.contentDisabled = true;
 		$scope.posaljiDugme = false;
 	}
+	$scope.isAdministrator = function() {
+		if($scope.activeUser.role == "ADMINISTRATOR")
+			return true;
+		else
+			return false;
+	}
+	$scope.isModerator = function() {
+		if($scope.activeUser.role == "MODERATOR")
+			return true;
+		else
+			return false;
+	}
+	$scope.isUser = function() {
+		if($scope.activeUser.role == "USER")
+			return true;
+		else
+			return false;
+	}
 }]);
 
 
 app.controller('loginController', [ '$scope', '$location', '$cookies', '$localStorage', 'loginService', 'registrationService', 'userFactory',  function($scope, $location, $cookies, $localStorage, loginService, registrationService, userFactory){
-	
-	$scope.errorMessage = false;
-	
+	$scope.errorMessage = false;	
 	$scope.user = {
 			"username" : "",
 			"password" : ""
 	}
-
-	$scope.login = function(){
-		
+	$scope.login = function(){		
 		var retVal = loginService.validateLoginInput($scope.user);
-		
 		if(retVal) {
 			$scope.errorMessage = retVal;
 		}
@@ -122,29 +171,19 @@ app.controller('loginController', [ '$scope', '$location', '$cookies', '$localSt
 					var logged = data;
 					$cookies.putObject("activeUser", logged);
 					$localStorage.loggedUser = logged.username;
-					if(logged.role == 'USER'){
-						$location.path('/user');
-					}/*else if(logged.role == 'ADMINISTRATOR'){
-						$location.path('/admin');
-					}else{
-						$location.path('/manager');
-					}*/
-					
+					$location.path('/user');
 				}else{
 					toast('Pogresno korisnicko ime ili lozinka');
 				}
 			});
 		}
 	}
-	
 	$scope.register = function(){
 		$location.path('/registration');
-	}
-		 
+	}	 
 }]);
 
-app.controller('registrationController', [ '$scope', '$filter', '$location', 'registrationService', 'userFactory',  function($scope, $filter, $location, registrationService, userFactory){
-	
+app.controller('registrationController', [ '$scope', '$filter', '$location', 'registrationService', 'userFactory',  function($scope, $filter, $location, registrationService, userFactory){	
 	$scope.errorMessage = false;
 	var datum = new Date();
 	var noviDatum = $filter('date')(datum, "dd-MM-yyyy");
@@ -157,14 +196,11 @@ app.controller('registrationController', [ '$scope', '$filter', '$location', 're
 			"phoneNumber" : "",
 			"role" : "USER",
 			"registrationDate" : noviDatum
-	}
-	
+	}	
 	$scope.passwordConfirm = "";
 	
-	$scope.register = function(){
-		
-		retVal = registrationService.validateRegistrationInput($scope.user, $scope.passwordConfirm)
-		
+	$scope.register = function(){		
+		retVal = registrationService.validateRegistrationInput($scope.user, $scope.passwordConfirm)	
 		if(retVal) {
 			$scope.errorMessage = retVal;
 		}
@@ -178,32 +214,26 @@ app.controller('registrationController', [ '$scope', '$filter', '$location', 're
 				}		
 			});
 		}
-	}
-		 
+	}		 
 }]);
 
 app.service('loginService', ['$http', '$window', function($http, $window){
-	
 	this.validateLoginInput = function(user){
 		if(user.email == "" || user.password == "")
 			return "Potrebno je uneti e-mail i lozinku."
 		
 		return false;
-	}
-	
-	 
+	}	 
 }]);
 
 app.service('registrationService', ['$http', '$window', '$timeout', function($http, $window, $timeout){
-	
 	this.validateRegistrationInput = function(user, passwordConfirm){
 		if(user.username == "" || user.password == "" || user.name == "" || user.surname == "" || passwordConfirm == ""
 			|| user.email == "" || user.phoneNumber == "")
 			return "Sva polja se moraju uneti."
 		if(user.password != passwordConfirm)
 			return "Lozinke se ne podudaraju.";
-		
-		return false;
-	}
 	
+		return false;
+	}	
 }]);

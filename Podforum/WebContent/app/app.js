@@ -6,9 +6,9 @@ app.run(['$cookies','$window',function($cookies, $window){
 	}else{
 		user = JSON.parse($cookies.get("activeUser"));
 		console.log(user);
-		if(user.role == "USER"){
-			$window.location.href = "http://localhost:8080/Podforum/#/user";
-		}
+		//if(user.role == "USER"){
+		$window.location.href = "http://localhost:8080/Podforum/#/user";
+		//}
 	}
 }]);
 
