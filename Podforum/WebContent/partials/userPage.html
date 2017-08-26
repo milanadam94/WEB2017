@@ -18,7 +18,7 @@
     		</div>
     		<ul class="nav navbar-nav">
       			<li class="active"><a href="">Entiteti</a></li>
-      			<li><a href="" ng-click="goToSubforum()" ng-if=!isUser()>Podforumi</a></li>
+      			<li><a href="" ng-click="goToSubforum()">Podforumi</a></li>
       			<li><a href="">Like/Dislike</a></li>
       			<li><a href="" ng-click="goToInbox()">Poruke</a></li>
       			<li><a href="" ng-click="editUser()" ng-if="isAdministrator()">Promena tipa</a></li>
@@ -29,8 +29,26 @@
     	</div>
 	</nav>
 	<div ng-show="viewSubforum">
-		<div>
+		<div ng-if=!isUser()>
 			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="noviForum()">Kreiranje foruma</button><br><br>
+		</div><br>
+		<div class="col-md-12">
+			<label><font color="blue" size="3">Podforumi:</font></label>
+			<table class="table table-bordered table-striped">
+				    <thead>
+				      <tr>
+				        <th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Zaprati</th><th ng-if=!isUser()>Obrisi</th>
+				      </tr>
+				     </thead>
+				     <tbody>
+				     	<tr ng-repeat="subforum in subforums">
+				     		<td> {{ subforum.name }} </td>
+				     		<td> {{ subforum.description }} </td>
+				     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
+				     		<td> <button type="submit" class="btn btn-info" ng-click="followSub(subforum)">Zaprati</button> </td>
+				     		<td ng-if=!isUser()> <button type="submit" class="btn btn-warning" ng-click="deleteSub(subforum)">Obrisi</button></td>
+				     </tbody>
+			</table>
 		</div>
 	</div>
 	<div ng-show="newSubforum" id="newSubforum">
@@ -42,7 +60,10 @@
 			<label class="control-label"> Opis: </label>  
 			<textarea rows="2" cols="50" class="form-control" ng-model="newSub.description" placeholder="Unesite opis podforuma"></textarea>
 		</div>
-		
+		<div class="form-group">	
+			<label class="control-label"> Pravila: </label>  
+			<textarea rows="2" cols="50" class="form-control" ng-model="newSub.rules" placeholder="Unesite pravila podforuma"></textarea>
+		</div>
 		<div class="form-group">
 	        <div class="fileupload fileupload-new" data-provides="fileupload">
 	            <div class="input-append">
@@ -59,17 +80,14 @@
 	        </div>                   
     	</div>
 	    <div class="form-group"  >
-	        <button type="submit"  value="Send" id="btnStartUpload" class="btn start" ng-click="uploadFile()" ng-disabled="!upload_button_state">
+	        <button type="submit"  value="Send" id="btnStartUpload" class="btn btn-primary" ng-click="uploadFile()" ng-disabled="!upload_button_state">
 	            <i class="icon-upload"></i>
-	            <span>Upload File</span>
-	        </button>                       
-	    </div>
-	    <div class="form-group">	
-			<button type="submit" class="btn btn-primary" ng-click="saveSubforum()"> Sacuvaj </button>
-			<button type="submit" class="btn btn-second pull-right" ng-click="cancelSubforum()"> Zatvori </button>
-		</div>
-    
+	            <span>Sacuvaj</span>
+	        </button>     
+	        <button type="submit" class="btn btn-second pull-right" ng-click="cancelSubforum()"> Zatvori </button>                  
+	    </div>   
 	</div>
+	
 	<div ng-show="viewInbox">		
 		<div>
 			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="novaPoruka()">Nova poruka</button><br><br>

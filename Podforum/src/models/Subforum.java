@@ -2,12 +2,15 @@ package models;
 
 import java.util.ArrayList;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Subforum {
 
 	private String name;
 	private String description;
 	private String iconPath;
-	private ArrayList<String> rules;
+	private String rules;
 	private String responibleModerator;
 	private ArrayList<User> moderators;
 	
@@ -15,7 +18,7 @@ public class Subforum {
 		super();
 	}
 
-	public Subforum(String name, String description, String iconPath, ArrayList<String> rules, String responibleModerator,
+	public Subforum(String name, String description, String iconPath, String rules, String responibleModerator,
 			ArrayList<User> moderators) {
 		super();
 		this.name = name;
@@ -50,11 +53,11 @@ public class Subforum {
 		this.iconPath = iconPath;
 	}
 
-	public ArrayList<String> getRules() {
+	public String getRules() {
 		return rules;
 	}
 
-	public void setRules(ArrayList<String> rules) {
+	public void setRules(String rules) {
 		this.rules = rules;
 	}
 

@@ -10,22 +10,18 @@ import java.util.ArrayList;
 
 import javax.servlet.ServletConfig;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import fileControllers.SubforumFileController;
-import fileControllers.UserFileController;
 import models.Subforum;
-import models.User;
 
 @Path("/subforum")
 public class SubforumController {
@@ -34,55 +30,30 @@ public class SubforumController {
 	private ServletConfig config;
 	
 	@POST
-	@Path("/saveSubforum")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
-	public String saveSubforum(Subforum subforum) throws FileNotFoundException, IOException{
-		ArrayList<Subforum> subforums = SubforumFileController.readSubforum(config);
-		
-		for (Subforum subforum2 : subforums) {
-			if(subforum2.getName().equals(subforum.getName())){
-				subforum2.setDescription(subforum.getDescription());
-				subforum2.setResponibleModerator(subforum.getResponibleModerator());
-				//subforums.add(subforum2);
-				SubforumFileController.writeSubforum(config, subforums);
-				return "Uspesno kreiran podforum";
-			}
-		}
-		return "";
-	}
-	
-	public File getMediaPath(String s){
-		//File file = new File(s);
-		File pathDatabase = new File(s);
-		if(!pathDatabase.exists()){
-			pathDatabase.mkdir();
-		}
-		return pathDatabase;
-	}
-	
-	@POST
-	@Path("uploadIcon/{subforumName}")
+	@Path("/addSubforum")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public synchronized Response uploadIcon(@PathParam("subforumName") String subforumName,
+	public synchronized String addSubforum(@FormDataParam("name") String name, @FormDataParam("rules") String rules, 
+			@FormDataParam("description") String description, @FormDataParam("responibleModerator") String responibleModerator,
 			@FormDataParam("file") InputStream in, @FormDataParam("file") FormDataContentDisposition info) throws FileNotFoundException, IOException{
 	
 		String s = config.getServletContext().getRealPath("");
 		String path = getMediaPath(s).getPath();
 		ArrayList<Subforum> subforums = SubforumFileController.readSubforum(config);
 		
-		Subforum subforum = new Subforum(subforumName, null, null, null, null, null);
+		for (Subforum subforum : subforums) {
+			if(subforum.getName().equals(name)){
+				return "Postoji podforum sa tim nazivom";
+			}
+		}
+		Subforum subforum = new Subforum(name, description, null, rules, responibleModerator, null);
 		subforums.add(subforum);
 		SubforumFileController.writeSubforum(config, subforums);
 	
 		try {
 			int read = 0;
 			File file = new File(path + "//" + "icons" + "//" +info.getFileName());
-			/*if(file.exists()){
-				return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-			}*/
 			for(Subforum sub : subforums){
-				if(sub.getName().equals(subforumName)){
+				if(sub.getName().equals(name)){
 					sub.setIconPath(file.getName());
 					SubforumFileController.writeSubforum(config, subforums);
 					break;
@@ -96,8 +67,39 @@ public class SubforumController {
 			out.flush();
 			out.close();
 		} catch (IOException e) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			return "Internal server error";
 		}
-		return Response.ok().build();
+		return "Uspesno kreiran podforum";
+	}
+	
+	@GET
+	@Path("/getSubforums")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Subforum> getSubforums() throws FileNotFoundException, IOException{
+		ArrayList<Subforum> subforums = SubforumFileController.readSubforum(config);
+		return subforums;
+	}
+	
+	@POST
+	@Path("/deleteSubforum")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String deleteSubforum(Subforum subform) throws FileNotFoundException, IOException{
+		ArrayList<Subforum> subforums = SubforumFileController.readSubforum(config);
+		for(int i = 0; i < subforums.size(); i++){
+			if(subforums.get(i).getName().equals(subform.getName())){
+				subforums.remove(i);
+				break;
+			}
+		}
+		SubforumFileController.writeSubforum(config, subforums);
+		return "Uspesno obrisan podforum.";
+	}
+	
+	public File getMediaPath(String s){
+		File pathDatabase = new File(s);
+		if(!pathDatabase.exists()){
+			pathDatabase.mkdir();
+		}
+		return pathDatabase;
 	}
 }

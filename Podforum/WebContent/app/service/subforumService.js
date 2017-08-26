@@ -1,10 +1,14 @@
 app.factory('subforumFactory', function($http){
 	var factory = {};
 	
-	factory.upload = function(uploadedFile, subforumName) {
+	factory.upload = function(uploadedFile, subforum) {
 		var fd = new FormData();
         fd.append("file", uploadedFile);
-        return $http.post('/Podforum/rest/subforum/uploadIcon/' + subforumName, fd, {
+        fd.append("name", subforum.name);
+        fd.append("description", subforum.description);
+        fd.append("rules", subforum.rules);
+        fd.append("responibleModerator", subforum.responibleModerator);
+        return $http.post('/Podforum/rest/subforum/addSubforum', fd, {
                         headers: {
                             'Content-Type': undefined
                         },
@@ -12,9 +16,13 @@ app.factory('subforumFactory', function($http){
        });
     }
 	
-	factory.saveSubforum = function(subforum) {
-		console.log(subforum)
-		return $http.post('/Podforum/rest/subforum/saveSubforum', subforum);
+	factory.getSubforums = function(){
+		return $http.get('/Podforum/rest/subforum/getSubforums');
 	}
+	
+	factory.deleteSub = function(subforum){
+		return $http.post('/Podforum/rest/subforum/deleteSubforum', subforum);
+	}
+	
 	return factory;
 });
