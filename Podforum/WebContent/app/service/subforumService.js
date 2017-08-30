@@ -24,5 +24,13 @@ app.factory('subforumFactory', function($http){
 		return $http.post('/Podforum/rest/subforum/deleteSubforum', subforum);
 	}
 	
+	factory.addFollowSubforum = function(username, subforum){
+		return $http.post('/Podforum/rest/subforum/addFollowSubforum/' + username, subforum);
+	}
+	
+	factory.getFollowSubforums = function(username){
+		return $http.get('/Podforum/rest/subforum/getFollowSubforums/' + username);
+	}
+	
 	return factory;
 });

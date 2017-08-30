@@ -1,4 +1,5 @@
-app.controller('userController', ['$scope', '$window', '$location', '$cookies', '$route', 'messageFactory', 'userFactory', 'subforumFactory', function($scope, $window, $location, $cookies, $route, messageFactory, userFactory, subforumFactory){
+app.controller('userController', ['$scope', '$window', '$location', '$cookies', '$route', '$filter', 'messageFactory', 'userFactory', 'subforumFactory', 'themeFactory', function($scope, $window, $location, $cookies, $route, $filter,
+		messageFactory, userFactory, subforumFactory, themeFactory){
 
 	if($cookies.get("activeUser") == null || $cookies.get("activeUser") == undefined){
 		$window.location.href = "http://localhost:8080/Podforum/#/login";
@@ -9,30 +10,101 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	$scope.inbox = [];
 	$scope.users = [];
 	$scope.subforums = [];
+	$scope.themes = [];
+	$scope.followedSubforums = [];
 	$scope.showTableInbox = true;
 	$scope.emptyInbox = false;
 	
 	$scope.message = {	"sender" : $scope.activeUser.username, "receiver" : null, "content" : null, "read" : false }
 	$scope.newSub = { "name" : null, "description" : null, "rules" : null, "responibleModerator" : $scope.activeUser.username}
+	$scope.subforumDetail = { "name" : null, "iconPath" : null}
+	var datum = new Date();
+	var noviDatum = $filter('date')(datum, "dd-MM-yyyy");
+	$scope.newTheme = { "subforum" : $scope.subforumDetail.name, "name" : null, "type" : null, "author" : $scope.activeUser.username, "comments" : null, "content" : null, "creatingDate" : noviDatum, "likes" : 0, "dislikes" : 0 }
 	$scope.viewInbox = false;
 	$scope.newMessage = false;
 	$scope.editProfile = false;
 	$scope.viewSubforum = false;
 	$scope.newSubforum = false;
-
+	$scope.viewFollowedSubforums = false;
+	$scope.subforumDetails = false;
 	
 	$scope.goToSubforum = function() {
 		subforumFactory.getSubforums().success(function(data){
 			$scope.subforums = data;
+		});
+		subforumFactory.getFollowSubforums($scope.activeUser.username).success(function(data){
+			$scope.followedSubforums = data;
 		});
 		$scope.viewInbox = false;
 		$scope.newMessage = false;
 		$scope.editProfile = false;
 		$scope.viewSubforum = true;
 		$scope.newSubforum = false;
+		$scope.viewFollowedSubforums = false;
+		$scope.subforumDetails = false;
 	}
 	$scope.followSub = function(subforum){
-		
+		$scope.isFollow = false;
+		for(i = 0; i < $scope.followedSubforums.length; i++){
+			if($scope.followedSubforums[i].name == subforum.name){
+				$scope.isFollow = true;
+			}
+		}
+		if(!$scope.isFollow){
+			$scope.followedSubforums.push(subforum);
+			subforumFactory.addFollowSubforum($scope.activeUser.username, subforum).success(function(data){
+				toast(data);
+			});
+		}else{
+			toast('Vec pratite ovaj forum.');
+		}
+	}
+	$scope.details = function(subforum){
+		$scope.subforumDetails = true;
+		$scope.subforumDetail.name = subforum.name;
+		$scope.subforumDetail.iconPath = subforum.iconPath;
+		themeFactory.getThemes(subforum.name).success(function(data){
+			$scope.themes = data;
+		});
+	}
+	$scope.createNewTheme = function(){
+		if(!$scope.newTheme.name){
+			toast('Morate uneti naslov teme');
+		}else if(!$scope.newTheme.type){
+			toast('Morate izabrati tip teme');
+		}else if(!$scope.newTheme.content){
+			toast('Morate uneti sadrzaj teme');
+		}else{
+			$scope.newTheme.subforum = $scope.subforumDetail.name;
+			themeFactory.addTheme($scope.newTheme).success(function(data){
+				if(data == "Uspesno kreirana tema"){
+					toast(data);
+				}else{
+					toast(data);
+				}
+			});
+		}
+	}
+	$scope.cancelNewTheme = function(){
+		themeFactory.getThemes($scope.subforumDetail.name).success(function(data){
+			$scope.themes = data;
+		});
+		$scope.newTheme.name = null;
+		$scope.newTheme.type = null;
+		$scope.newTheme.content = null;
+	}
+	$scope.praceniPodforumi = function(){
+		$scope.subforumDetails = false;
+		$scope.viewFollowedSubforums = true;
+		$scope.viewInbox = false;
+		$scope.newMessage = false;
+		$scope.editProfile = false;
+		$scope.viewSubforum = false;
+		$scope.newSubforum = false;
+		subforumFactory.getFollowSubforums($scope.activeUser.username).success(function(data){
+			$scope.followedSubforums = data;
+		});
 	}
 	$scope.deleteSub = function(subforum){
 		if($scope.isAdministrator()){
@@ -56,6 +128,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		}
 	}
 	$scope.noviForum = function() {
+		$scope.subforumDetails = false;
 		$scope.viewInbox = false;
 		$scope.newMessage = false;
 		$scope.editProfile = false;
@@ -160,6 +233,8 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$location.path('/login');
 	} 	 	
 	$scope.goToInbox = function() {
+		$scope.subforumDetails = false;
+		$scope.viewFollowedSubforums = false;
 		$scope.viewSubforum = false;
 		$scope.newSubforum = false;
 		$scope.viewSubforum = false;
@@ -175,6 +250,8 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		});
 	}
 	$scope.novaPoruka = function() {
+		$scope.subforumDetails = false;
+		$scope.viewFollowedSubforums = false;
 		$scope.viewSubforum = false;
 		$scope.newSubforum = false;
 		$scope.viewSubforum = false;
@@ -192,6 +269,9 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		}else{
 			$scope.message.receiver = $scope.receiver;
 			$scope.message.content = $scope.content;
+			if($scope.message.receiver == $scope.activeUser.username){
+				$scope.inbox.push($scope.message);
+			}
 			messageFactory.send($scope.message).success(function(data){
 				if(data == "Poruka poslata"){
 					toast(data);
@@ -297,16 +377,7 @@ app.controller('registrationController', [ '$scope', '$filter', '$location', 're
 	$scope.errorMessage = false;
 	var datum = new Date();
 	var noviDatum = $filter('date')(datum, "dd-MM-yyyy");
-	$scope.user = {
-			"username" : "",
-			"password" : "",
-			"name" : "",
-			"surname" : "",
-			"email" : "",
-			"phoneNumber" : "",
-			"role" : "USER",
-			"registrationDate" : noviDatum
-	}	
+	$scope.user = { "username" : "", "password" : "", "name" : "", "surname" : "", "email" : "", "phoneNumber" : "", "role" : "USER", "registrationDate" : noviDatum }	
 	$scope.passwordConfirm = "";
 	
 	$scope.register = function(){		

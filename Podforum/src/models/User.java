@@ -16,12 +16,12 @@ public class User {
 	private String phoneNumber;
 	private String registrationDate;
 	
-	private ArrayList<Subforum> subforums;
-	private ArrayList<Theme> themes;
-	private ArrayList<Comment> comments;
+	private ArrayList<Subforum> subforums = new ArrayList<Subforum>();
+	private ArrayList<Theme> themes = new ArrayList<Theme>();
+	private ArrayList<Comment> comments = new ArrayList<Comment>();
 	
 	public User() {
-		
+	
 	}
 	
 	public String getUsername() {
@@ -81,6 +81,19 @@ public class User {
 		this.subforums = subforums;
 	}
 
+	public void addSubforum(Subforum subforum){
+		if(subforums == null){
+			this.subforums = new ArrayList<Subforum>();
+			subforums.add(subforum);
+		}else{
+			this.subforums.add(subforum);
+		}
+	}
+	
+	public void removeSubforum(Subforum subforum){
+		this.subforums.remove(subforum);
+	}
+	
 	public ArrayList<Theme> getThemes() {
 		return themes;
 	}

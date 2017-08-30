@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 public class Theme {
 
-	private Subforum subforum;
+	private String subforum;
 	private String name;
 	private ThemeType type;
-	private User author;
+	private String author;
 	private ArrayList<Comment> comments;
 	private String content;
 	private String creatingDate;
@@ -18,11 +18,26 @@ public class Theme {
 		super();
 	}
 
-	public Subforum getSubforum() {
+	
+	public Theme(String subforum, String name, ThemeType type, String author, String content, String creatingDate,
+			int likes, int dislikes) {
+		super();
+		this.subforum = subforum;
+		this.name = name;
+		this.type = type;
+		this.author = author;
+		this.content = content;
+		this.creatingDate = creatingDate;
+		this.likes = likes;
+		this.dislikes = dislikes;
+	}
+
+
+	public String getSubforum() {
 		return subforum;
 	}
 
-	public void setSubforum(Subforum subforum) {
+	public void setSubforum(String subforum) {
 		this.subforum = subforum;
 	}
 
@@ -42,11 +57,11 @@ public class Theme {
 		this.type = type;
 	}
 
-	public User getAuthor() {
+	public String getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(User author) {
+	public void setAuthor(String author) {
 		this.author = author;
 	}
 

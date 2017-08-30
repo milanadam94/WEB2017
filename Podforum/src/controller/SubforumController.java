@@ -13,6 +13,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -21,7 +22,9 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import fileControllers.SubforumFileController;
+import fileControllers.UserFileController;
 import models.Subforum;
+import models.User;
 
 @Path("/subforum")
 public class SubforumController {
@@ -83,10 +86,21 @@ public class SubforumController {
 	@POST
 	@Path("/deleteSubforum")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String deleteSubforum(Subforum subform) throws FileNotFoundException, IOException{
+	public String deleteSubforum(Subforum subforum) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
 		ArrayList<Subforum> subforums = SubforumFileController.readSubforum(config);
+		for(int i = 0; i < users.size(); i++){
+			ArrayList<Subforum> followSub = users.get(i).getSubforums();
+			for(int j = 0; j < followSub.size(); j++){
+				if(followSub.get(j).getName().equals(subforum.getName())){
+					users.get(i).removeSubforum(followSub.get(j));
+					break;
+				}
+			}
+		}
+		UserFileController.writeUser(config, users);
 		for(int i = 0; i < subforums.size(); i++){
-			if(subforums.get(i).getName().equals(subform.getName())){
+			if(subforums.get(i).getName().equals(subforum.getName())){
 				subforums.remove(i);
 				break;
 			}
@@ -95,6 +109,33 @@ public class SubforumController {
 		return "Uspesno obrisan podforum.";
 	}
 	
+	@POST
+	@Path("/addFollowSubforum/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String addFollowSubforum(@PathParam(value = "username") String username, Subforum subforum) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		for(User user : users){
+			if(user.getUsername().equals(username)){
+				user.addSubforum(subforum);
+				break;
+			}
+		}
+		UserFileController.writeUser(config, users);
+		return "Zapratili ste podforum.";
+	}
+	
+	@GET
+	@Path("/getFollowSubforums/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Subforum> getfollowSubforums(@PathParam(value = "username") String username) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		for(User user : users){
+			if(user.getUsername().equals(username)){
+				return user.getSubforums();
+			}
+		}
+		return null;
+	}
 	public File getMediaPath(String s){
 		File pathDatabase = new File(s);
 		if(!pathDatabase.exists()){
