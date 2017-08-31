@@ -10,17 +10,18 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	$scope.inbox = [];
 	$scope.users = [];
 	$scope.subforums = [];
-	$scope.themes = [];
 	$scope.followedSubforums = [];
+	$scope.themes = [];
+	$scope.savedThemes = [];
 	$scope.showTableInbox = true;
 	$scope.emptyInbox = false;
 	
 	$scope.message = {	"sender" : $scope.activeUser.username, "receiver" : null, "content" : null, "read" : false }
 	$scope.newSub = { "name" : null, "description" : null, "rules" : null, "responibleModerator" : $scope.activeUser.username}
-	$scope.subforumDetail = { "name" : null, "iconPath" : null}
+	$scope.subforumDetail = null;
 	var datum = new Date();
 	var noviDatum = $filter('date')(datum, "dd-MM-yyyy");
-	$scope.newTheme = { "subforum" : $scope.subforumDetail.name, "name" : null, "type" : null, "author" : $scope.activeUser.username, "comments" : null, "content" : null, "creatingDate" : noviDatum, "likes" : 0, "dislikes" : 0 }
+	$scope.newTheme = { "subforum" : $scope.subforumDetail, "name" : null, "type" : null, "author" : $scope.activeUser.username, "comments" : null, "content" : null, "creatingDate" : noviDatum, "likes" : 0, "dislikes" : 0 }
 	$scope.viewInbox = false;
 	$scope.newMessage = false;
 	$scope.editProfile = false;
@@ -62,11 +63,13 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	}
 	$scope.details = function(subforum){
 		$scope.subforumDetails = true;
-		$scope.subforumDetail.name = subforum.name;
-		$scope.subforumDetail.iconPath = subforum.iconPath;
+		$scope.subforumDetail = subforum;
 		themeFactory.getThemes(subforum.name).success(function(data){
 			$scope.themes = data;
 		});
+		themeFactory.getSavedThemes($scope.activeUser.username).success(function(data){
+			$scope.savedThemes = data;
+		})
 	}
 	$scope.createNewTheme = function(){
 		if(!$scope.newTheme.name){
@@ -76,7 +79,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		}else if(!$scope.newTheme.content){
 			toast('Morate uneti sadrzaj teme');
 		}else{
-			$scope.newTheme.subforum = $scope.subforumDetail.name;
+			$scope.newTheme.subforum = $scope.subforumDetail;
 			themeFactory.addTheme($scope.newTheme).success(function(data){
 				if(data == "Uspesno kreirana tema"){
 					toast(data);
@@ -84,6 +87,100 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 					toast(data);
 				}
 			});
+		}
+	}
+	$scope.saveTheme = function(theme) {
+		$scope.isSaved = false;
+		for(i = 0; i < $scope.savedThemes.length; i++){
+			if($scope.savedThemes[i].name == theme.name)
+				$scope.isSaved = true;
+		}
+		if(!$scope.isSaved){
+			$scope.savedThemes.push(theme);
+			themeFactory.saveTheme($scope.activeUser.username, theme).success(function(data){
+				toast(data);
+			});
+		}else{
+			toast('Vec ste snimili ovu temu');
+		}
+	}
+	$scope.editTheme = function(theme){
+		var date = new Date();
+		var newDate = $filter('date')(date, "dd-MM-yyyy");
+		$scope.editThemeModal = { "subforum" : theme.subforum, "name" : theme.name, "type" : theme.type, "author" : theme.author, "comments" : theme.comments,
+			"content" : theme.content, "creatingDate" : newDate, "likes" : theme.likes, "dislikes" : theme.dislikes }
+
+	}
+	$scope.cancelEditTheme = function(){
+		$scope.editThemeModal = null;
+	}
+	$scope.saveEditTheme = function(){
+		if($scope.isAdministrator()){
+			themeFactory.editTheme($scope.editThemeModal).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.themes.length; i++){
+					if($scope.themes[i].name == $scope.editThemeModal.name){
+						$scope.themes[i].type = $scope.editThemeModal.type;
+						$scope.themes[i].content = $scope.editThemeModal.content;
+						$scope.themes[i].creatingDate = $scope.editThemeModal.creatingDate;
+					}
+				}
+			});
+		}else if($scope.activeUser.username == $scope.editThemeModal.subforum.responibleModerator){
+			console.log("odgovorni")
+			themeFactory.editTheme($scope.editThemeModal).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.themes.length; i++){
+					if($scope.themes[i].name == $scope.editThemeModal.name){
+						$scope.themes[i].type = $scope.editThemeModal.type;
+						$scope.themes[i].content = $scope.editThemeModal.content;
+						$scope.themes[i].creatingDate = $scope.editThemeModal.creatingDate;
+					}
+				}
+			});
+		}else if($scope.activeUser.username == $scope.editThemeModal.author){
+			console.log("autor")
+			themeFactory.editTheme($scope.editThemeModal).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.themes.length; i++){
+					if($scope.themes[i].name == $scope.editThemeModal.name){
+						$scope.themes[i].type = $scope.editThemeModal.type;
+						$scope.themes[i].content = $scope.editThemeModal.content;
+						$scope.themes[i].creatingDate = $scope.editThemeModal.creatingDate;
+					}
+				}
+			});
+		}else{
+			toast('Ne mozete izmeniti ovu temu');
+		}
+	}
+	$scope.deleteTheme = function(theme){
+		if($scope.isAdministrator()){
+			themeFactory.deleteTheme(theme).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.themes.length; i++){
+					if($scope.themes[i].name == theme.name)
+						$scope.themes.splice(i,1);
+				}
+			});
+		}else if($scope.activeUser.username == theme.subforum.responibleModerator){
+			themeFactory.deleteTheme(theme).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.themes.length; i++){
+					if($scope.themes[i].name == theme.name)
+						$scope.themes.splice(i,1);
+				}
+			});
+		}else if($scope.activeUser.username == theme.author){
+			themeFactory.deleteTheme(theme).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.themes.length; i++){
+					if($scope.themes[i].name == theme.name)
+						$scope.themes.splice(i,1);
+				}
+			});
+		}else{
+			toast('Ne mozete obrisati temu');
 		}
 	}
 	$scope.cancelNewTheme = function(){
@@ -128,6 +225,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		}
 	}
 	$scope.noviForum = function() {
+		$scope.viewFollowedSubforums = false;
 		$scope.subforumDetails = false;
 		$scope.viewInbox = false;
 		$scope.newMessage = false;
@@ -186,6 +284,8 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$scope.newSub.rules = null;
 	}
 	$scope.editUser = function() {
+		$scope.viewFollowedSubforums = false;
+		$scope.subforumDetails = false;
 		$scope.viewSubforum = false;
 		$scope.newSubforum = false;
 		$scope.viewInbox = false;

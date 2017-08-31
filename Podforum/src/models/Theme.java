@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Theme {
 
-	private String subforum;
+	private Subforum subforum;
 	private String name;
 	private ThemeType type;
 	private String author;
@@ -19,7 +19,7 @@ public class Theme {
 	}
 
 	
-	public Theme(String subforum, String name, ThemeType type, String author, String content, String creatingDate,
+	public Theme(Subforum subforum, String name, ThemeType type, String author, String content, String creatingDate,
 			int likes, int dislikes) {
 		super();
 		this.subforum = subforum;
@@ -33,11 +33,11 @@ public class Theme {
 	}
 
 
-	public String getSubforum() {
+	public Subforum getSubforum() {
 		return subforum;
 	}
 
-	public void setSubforum(String subforum) {
+	public void setSubforum(Subforum subforum) {
 		this.subforum = subforum;
 	}
 

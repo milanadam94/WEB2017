@@ -15,7 +15,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import fileControllers.ThemeFileController;
+import fileControllers.UserFileController;
 import models.Theme;
+import models.User;
 
 @Path("/theme")
 public class ThemeController {
@@ -30,7 +32,7 @@ public class ThemeController {
 		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
 		ArrayList<Theme> themesOfSubforum = new ArrayList<Theme>();
 		for (Theme t : themes) {
-			if(t.getSubforum().equals(theme.getSubforum()))
+			if(t.getSubforum().getName().equals(theme.getSubforum().getName()))
 				themesOfSubforum.add(t);
 		}
 		for (Theme t : themesOfSubforum) {
@@ -45,6 +47,62 @@ public class ThemeController {
 		return "Uspesno kreirana tema";
 	}
 	
+	@POST
+	@Path("/editTheme")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String editTheme(Theme theme) throws FileNotFoundException, IOException{
+		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
+		ArrayList<User> users = UserFileController.readUser(config);
+		for(int i = 0; i < users.size(); i++){
+			ArrayList<Theme> savedThemes = users.get(i).getThemes();
+			for(int j = 0; j < savedThemes.size(); j++){
+				if(savedThemes.get(j).getName().equals(theme.getName())){
+					users.get(i).removeSavedTheme(savedThemes.get(j));
+					users.get(i).saveTheme(theme);
+					break;
+				}
+			}
+		}
+		UserFileController.writeUser(config, users);
+		for (int i = 0; i < themes.size(); i++) {
+			if(themes.get(i).getName().equals(theme.getName())){
+				themes.get(i).setType(theme.getType());
+				themes.get(i).setContent(theme.getContent());
+				themes.get(i).setCreatingDate(theme.getCreatingDate());
+				break;
+			}
+		}
+		ThemeFileController.writeTheme(config, themes);
+		return "Uspesno izmenjena tema";
+	}
+	
+	@POST
+	@Path("/deleteTheme")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String deleteTheme(Theme theme) throws FileNotFoundException, IOException{
+		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
+		ArrayList<User> users = UserFileController.readUser(config);
+		for(int i = 0; i < users.size(); i++){
+			ArrayList<Theme> savedThemes = users.get(i).getThemes();
+			for(int j = 0; j < savedThemes.size(); j++){
+				if(savedThemes.get(j).getName().equals(theme.getName())){
+					users.get(i).removeSavedTheme(savedThemes.get(j));
+					break;
+				}
+			}
+		}
+		UserFileController.writeUser(config, users);
+		
+		for(int i = 0; i < themes.size(); i++){
+			if(themes.get(i).getName().equals(theme.getName())){
+				themes.remove(i);
+				break;
+			}
+		}
+		ThemeFileController.writeTheme(config, themes);
+		return "Uspesno obrisana tema";
+	}
+	
 	@GET
 	@Path("/getThemes/{subforumName}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -52,9 +110,37 @@ public class ThemeController {
 		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
 		ArrayList<Theme> themesOfSubforum = new ArrayList<Theme>();
 		for (Theme t : themes) {
-			if(t.getSubforum().equals(subforumName))
+			if(t.getSubforum().getName().equals(subforumName))
 				themesOfSubforum.add(t);
 		}
 		return themesOfSubforum;
+	}
+	
+	@GET
+	@Path("/getSavedThemes/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Theme> getSavedThemes(@PathParam(value = "username") String username) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		for (User user : users) {
+			if(user.getUsername().equals(username)){
+				return user.getThemes();
+			}
+		}
+		return null;
+	}
+	
+	@POST
+	@Path("/saveTheme/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String saveTheme(@PathParam(value = "username") String username, Theme theme) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		for (User user : users) {
+			if(user.getUsername().equals(username)){
+				user.saveTheme(theme);
+				break;
+			}
+		}
+		UserFileController.writeUser(config, users);
+		return "Snimili ste temu";
 	}
 }

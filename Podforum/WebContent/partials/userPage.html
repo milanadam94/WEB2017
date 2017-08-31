@@ -30,82 +30,60 @@
 	</nav>
 	<div ng-show="viewSubforum">
 		<div>
-			&nbsp;&nbsp;&nbsp;<button ng-if=!isUser() type="submit" class="btn btn-primary" ng-click="noviForum()">Kreiranje foruma</button>
-			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="praceniPodforumi()">Praceni podforumi</button>
+			&nbsp;&nbsp;&nbsp;<button ng-if=!isUser() type="submit" class="btn btn-primary" ng-click="noviForum()"><span style="font-size:large;">Kreiranje foruma</span></button>
+			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="praceniPodforumi()"><span style="font-size:large;">Praceni podforumi</span></button>
 		</div>
 		
 		<br>
-		<div class="col-md-12">
-			<label><font color="blue" size="3">Podforumi:</font></label>
-			<table class="table table-bordered table-striped">
-				    <thead>
-				      <tr>
-				        <th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Zaprati</th><th ng-if=!isUser()>Obrisi</th><th>Detalji</th>
-				      </tr>
-				     </thead>
-				     <tbody>
-				     	<tr ng-repeat="subforum in subforums">
-				     		<td> {{ subforum.name }} </td>
-				     		<td> {{ subforum.description }} </td>
-				     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
-				     		<td> <button type="submit" class="btn btn-info" ng-click="followSub(subforum)">Zaprati</button> </td>
-				     		<td ng-if=!isUser()> <button type="submit" class="btn btn-warning" ng-click="deleteSub(subforum)">Obrisi</button></td>
-				     		<td> <button type="submit" class="btn btn-success" ng-click="details(subforum)">Detalji</button> </td>
-				     </tbody>
-			</table>
+		<div class="container">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Podforumi: </label>
+					</div>
+						<table class="table table-striped">
+				    		<thead>
+				      			<tr>
+				        			<th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Zaprati</th><th ng-if=!isUser()>Obrisi</th><th>Detalji</th>
+				      			</tr>
+				     		</thead>
+				     		<tbody>
+						     	<tr ng-repeat="subforum in subforums">
+						     		<td> {{ subforum.name }} </td>
+						     		<td> {{ subforum.description }} </td>
+						     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
+						     		<td> <button type="submit" class="btn btn-info" ng-click="followSub(subforum)"><span style="font-size:large;">Zaprati</span></button> </td>
+						     		<td ng-if=!isUser()> <button type="submit" class="btn btn-warning" ng-click="deleteSub(subforum)"><span style="font-size:large;">Obrisi</span></button></td>
+						     		<td> <button type="submit" class="btn btn-success buttons" ng-click="details(subforum)"><span style="font-size:large;">Detalji</span></button> </td>
+						     	</tr>
+				     		</tbody>
+						</table>
+					
+				</div>
+			</div>	
 		</div>
 	</div>
-	<div ng-show="viewFollowedSubforums">
-		<div class="row">
-                <div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Praceni podforumi</div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Naziv</th>
-                                            <th>Opis</th>
-                                            <th>Ikonica</th>
-                                            <th>Detalji</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+	<div ng-show="viewFollowedSubforums" class="container">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Praceni podforumi: </label>
+					</div>
+						<table class="table table-striped">
+				    		<thead>
+                            	<tr><th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Detalji</th></tr>
+                            </thead>
+                            <tbody>
                                     	<tr ng-repeat="subforum in followedSubforums">
 				     		<td> {{ subforum.name }} </td>
 				     		<td> {{ subforum.description }} </td>
 				     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
-				     		<td> <button type="submit" class="btn btn-success" ng-click="details(subforum)">Detalji</button> </td>
+				     		<td> <button type="submit" class="btn btn-success" ng-click="details(subforum)"><span style="font-size:large;">Detalji</span></button> </td>
 				     					</tr>
-				     				</tbody>
-                                </table>
-                            </div>
-                            <!-- /.table-responsive -->
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-             </div>
-		<!--  <div class="col-md-12">
-			<label><font color="blue" size="3">Praceni podforumi:</font></label>
-			<table class="table table-bordered table-striped">
-				    <thead>
-				      <tr>
-				        <th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Detalji</th>
-				      </tr>
-				     </thead>
-				     <tbody>
-				     	<tr ng-repeat="subforum in followedSubforums">
-				     		<td> {{ subforum.name }} </td>
-				     		<td> {{ subforum.description }} </td>
-				     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
-				     		<td> <button type="submit" class="btn btn-success" ng-click="details(subforum)">Detalji</button> </td>
-				     </tbody>
-			</table>
-		</div> -->
+				     		</tbody>
+                         </table>
+                 </div>
+        	</div>
 	</div>
 	<div ng-show="subforumDetails">
 		<md-toolbar>
@@ -114,42 +92,39 @@
 				<!--  <img src="http://imgur.com/gallery/81qU4Zo" alt="icon" height="32px" width="32px">-->
 				<img src="icons/{{subforumDetail.iconPath}}" alt="icon" height="48px" width="48px">
 				<span flex></span>
-				<button type="submit" class="btn btn-info" data-toggle="modal" data-target="#newThemeModal">Nova tema</button>
+				<button type="submit" class="btn btn-info" data-toggle="modal" data-target="#newThemeModal"><span style="font-size:large;">Nova tema</span></button>
 				<md-button aria-label="Settings" ng-click="logOut()"><md-title>Log out</md-title></md-button>
 			</div>
 		</md-toolbar>
-		<br><br>
-		<div class="row">
-                <div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Teme: </div>
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-bordered table-hover">
-                                    <thead>
-                                        <tr><th>Naslov</th><th>Tip</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>Detalji</th><th>Izmeni</th><th>Obrisi</th></tr>
-                                    </thead>
+		<br>
+		<div class="container">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Teme: </label>
+					</div>
+						<table class="table table-striped">
+				    		<thead>
+                            	<tr><th>Naslov</th><th>Tip</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>Snimi</th><th>Izmeni</th><th>Obrisi</th></tr>
+                            </thead>
                                     <tbody>
                                     	<tr ng-repeat="theme in themes">
                                     		<td> {{ theme.name }} </td>
                                     		<td> {{ theme.type }} </td>
-                                    		<td> {{ theme.content }} </td>
+                                    		<td ng-if="theme.type != 'IMAGE'"> {{ theme.content }} </td>
+                                    		<td ng-if="theme.type == 'IMAGE'"> <img alt="ikonica" src="{{theme.content}}" height="50px" width="50px"> </td>
                                     		<td> {{ theme.author }} </td>
                                     		<td> {{ theme.creatingDate }} </td>
-                                    		<td> <button type="submit" class="btn btn-success" ng-click="">Detalji</button> </td>
-                                    		<td> <button type="submit" class="btn btn-warning" ng-click="">Izmeni</button> </td>
-                                    		<td> <button type="submit" class="btn btn-danger" ng-click="">Obrisi</button> </td>
+                                    		<td> <button type="submit" class="btn btn-success" ng-click="saveTheme(theme)"><span style="font-size:large;">Snimi</span></button> </td>
+                                    		<td> <button type="submit" class="btn btn-warning" ng-click="editTheme(theme)" data-toggle="modal" data-target="#editThemeModal"><span style="font-size:large;">Izmeni</span></button> </td>
+                                    		<td> <button type="submit" class="btn btn-danger" ng-click="deleteTheme(theme)"><span style="font-size:large;">Obrisi</span></button> </td>
                                     	</tr>
                                     </tbody>
-                                </table>
-                            </div>
-                        </div>
-                     </div>
-                </div>
-		</div>
-           
+                         </table>
+                 </div>
+          	</div>
+       	</div>
 	</div>
-	
 	<div ng-show="newSubforum" id="newSubforum">
 		<div class="form-group">
 			<label class="control-label"> Naziv: </label>  
@@ -181,19 +156,24 @@
 	    <div class="form-group"  >
 	        <button type="submit"  value="Send" id="btnStartUpload" class="btn btn-primary" ng-click="uploadFile()" ng-disabled="!upload_button_state">
 	            <i class="icon-upload"></i>
-	            <span>Sacuvaj</span>
+	            <span style="font-size:large;">Sacuvaj</span>
 	        </button>     
-	        <button type="submit" class="btn btn-second pull-right" ng-click="cancelSubforum()"> Zatvori </button>                  
+	        <button type="submit" class="btn btn-second pull-right" ng-click="cancelSubforum()"><span style="font-size:large;"> Zatvori </span></button>                  
 	    </div>   
 	</div>
 	
 	<div ng-show="viewInbox">		
 		<div>
-			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="novaPoruka()">Nova poruka</button><br><br>
+			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="novaPoruka()"><span style="font-size:large;">Nova poruka</span></button><br><br>
 		</div>
-		<div class="col-md-12" ng-show="showTableInbox">
-			<label><font color="blue" size="3">Primljene poruke:</font></label>
-			<table class="table table-bordered table-striped">
+		<div ng-show="showTableInbox">
+			<div class="container">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Primljene poruke: </label>
+					</div>
+						<table class="table table-striped">
 				    <thead>
 				      <tr>
 				        <th>Pošiljalac</th><th>Poruka</th><th>Detalji</th><th>Odgovori</th>
@@ -204,14 +184,16 @@
 				     		<td > {{ messageInbox.sender }} </td>
 				     		<td ng-if="messageInbox.read == false" style="background:red" > {{ messageInbox.content }} </td>
 				     		<td ng-if="messageInbox.read == true" style="background:lightgreen" > {{ messageInbox.content }} </td>
-				     		<td> <button type="submit" class="btn btn-info" ng-click="detalji(messageInbox)">Detalji</button> </td>
-				     		<td> <button type="submit" class="btn btn-warning" ng-click="odgovori(messageInbox)">Odgovori</button></td>
+				     		<td> <button type="submit" class="btn btn-info" ng-click="detalji(messageInbox)"><span style="font-size:large;">Detalji</span></button> </td>
+				     		<td> <button type="submit" class="btn btn-warning" ng-click="odgovori(messageInbox)"><span style="font-size:large;">Odgovori</span></button></td>
 				     </tbody>
-			</table>
-		</div>  
+						</table>
+				</div>
+			</div>  
+			</div>
 		<div class="form-group text-danger" ng-if="emptyInbox">{{ emptyInbox }}</div>
+		</div>
 	</div>
-	
 	<div ng-show="newMessage" id="newMessage">
 		<div class="form-group">
 			<label for="receiver" class="control-label"> Primalac: </label>  
@@ -222,14 +204,18 @@
 			<textarea rows="4" cols="50" class="form-control" ng-model="content" ng-disabled="contentDisabled" placeholder="Unesite sadrzaj poruke"></textarea>
 		</div>
 		<div class="form-group">	
-			<button type="submit" class="btn btn-primary" ng-click="send()" ng-show="posaljiDugme"> Posalji </button>
-			<button type="submit" class="btn btn-second pull-right" ng-click="cancel()"> Zatvori </button>
+			<button type="submit" class="btn btn-primary" ng-click="send()" ng-show="posaljiDugme"> <span style="font-size:large;">Posalji </span></button>
+			<button type="submit" class="btn btn-second pull-right" ng-click="cancel()"> <span style="font-size:large;">Zatvori </span></button>
 		</div>
 	</div>	
 	<div ng-show="editProfile">
-		<div class="col-md-12">
-			<label><font color="blue" size="3">Registrovani korisnici:</font></label>
-			<table class="table table-bordered table-striped">
+		<div class="container">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Registrovani korisnici: </label>
+					</div>
+						<table class="table table-striped">
 				    <thead>
 				      <tr>
 				        <th>Korisničko ime</th><th>Ime</th><th>Prezime</th><th>Email</th><th>Uloga</th><th>Izmena</th>
@@ -242,10 +228,12 @@
 				     		<td> {{ user.surname }}</td>
 				     		<td> {{ user.email }}</td>
 				     		<td> {{ user.role }}</td>
-				     		<td> <button type="submit" class="btn btn-info" data-toggle="modal" data-target="#profileModal" ng-click="editRole(user)">Izmeni</button> </td>
+				     		<td> <button type="submit" class="btn btn-info" data-toggle="modal" data-target="#profileModal" ng-click="editRole(user)"><span style="font-size:large;">Izmeni</span></button>  </td>
 				     </tbody>
-			</table>
-		</div> 
+						</table>
+				</div> 
+			</div>
+		</div>
 	</div>
 	
 	<div id="newThemeModal" class="modal fade" role="dialog">
@@ -253,7 +241,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 			        	<button type="button" class="close" data-dismiss="modal">&times;</button>
-			        	<h4 class="modal-title">Nova tema</h4>
+			        	<h3 class="modal-title">Nova tema</h3>
 			      	</div>
 			      	<div class="modal-body">
 			      		<div class="form-group">
@@ -275,19 +263,52 @@
 						
 			      	</div>
 			      	<div class="modal-footer">
-			      		<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="cancelNewTheme()">Izađi</button>
-			        	<button type="submit" class="btn btn-primary pull-left" ng-click="createNewTheme()" >Sacuvaj</button>
+			      		<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="cancelNewTheme()"><span style="font-size:large;">Izađi</span></button>
+			        	<button type="submit" class="btn btn-primary pull-left" ng-click="createNewTheme()" ><span style="font-size:large;">Sacuvaj</span></button>
 			      	</div>
 				</div>
 			</div>
 		</div>
-	
+	<div id="editThemeModal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+			        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+			        	<h3 class="modal-title">Izmena teme</h3>
+			      	</div>
+			      	<div class="modal-body">
+			      		<div class="form-group">
+							<label class="control-label" for="name">Naslov:</label>
+							<input type="text" class="form-control" id="username" ng-model="editThemeModal.name" disabled>
+						</div>
+						<div class="form-group">
+							<label class="control-label" for="type">Tip:</label>
+							<select class="form-control" ng-model="editThemeModal.type">
+								<option value="IMAGE">Slika</option>
+								<option value="LINK">Link</option>
+								<option value="TEXT">Tekst</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label class="control-label" for="content">Sadrzaj:</label>
+							<input type="text" class="form-control" id="content" ng-model="editThemeModal.content">
+						</div>
+						
+			      	</div>
+			      	<div class="modal-footer">
+			      		<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="cancelEditTheme()"><span style="font-size:large;">Izađi</span></button>
+			        	<button type="submit" class="btn btn-primary pull-left" ng-click="saveEditTheme()" ><span style="font-size:large;">Izmeni</span></button>
+			      	</div>
+				</div>
+			</div>
+		</div>
+		
 	<div id="profileModal" class="modal fade" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
 			        	<button type="button" class="close" data-dismiss="modal">&times;</button>
-			        	<h4 class="modal-title">Promena tipa</h4>
+			        	<h3 class="modal-title">Promena tipa</h3>
 			      	</div>
 			      	<div class="modal-body">
 			      		<div class="form-group">
@@ -309,8 +330,8 @@
 						
 			      	</div>
 			      	<div class="modal-footer">
-			      		<button type="button" class="btn btn-primary" data-dismiss="modal">Izađi</button>
-			        	<button type="submit" class="btn btn-primary pull-left" data-dismiss="modal" ng-click="changeRole(editModal.username, editModal.role)" > Izmeni </button>
+			      		<button type="button" class="btn btn-primary" data-dismiss="modal"><span style="font-size:large;">Izađi</span></button>
+			        	<button type="submit" class="btn btn-primary pull-left" data-dismiss="modal" ng-click="changeRole(editModal.username, editModal.role)" ><span style="font-size:large;">Izmeni</span></button>
 			      	</div>
 				</div>
 			</div>

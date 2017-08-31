@@ -98,6 +98,19 @@ public class User {
 		return themes;
 	}
 
+	public void saveTheme(Theme theme){
+		if(themes == null){
+			this.themes = new ArrayList<Theme>();
+			themes.add(theme);
+		}else{
+			this.themes.add(theme);
+		}
+	}
+	
+	public void removeSavedTheme(Theme theme){
+		this.themes.remove(theme);
+	}
+	
 	public void setThemes(ArrayList<Theme> themes) {
 		this.themes = themes;
 	}
