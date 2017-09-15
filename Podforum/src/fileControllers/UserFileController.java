@@ -33,11 +33,11 @@ public class UserFileController {
 		String path = FilePaths.getPath(config).getPath();
 		ObjectMapper mapper = new ObjectMapper();
 		
-		File varTmpDir = new File(path+"//User.txt");
+		File varTmpDir = new File(path+"//User.json");
 		boolean exists = varTmpDir.exists();
 		if(!exists){
 			try {
-				PrintWriter wr = new PrintWriter(path+"//User.txt");
+				PrintWriter wr = new PrintWriter(path+"//User.json");
 				wr.close();
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
@@ -45,7 +45,7 @@ public class UserFileController {
 		}
 		
 		
-		FileInputStream fis = new FileInputStream(new File(path+"//User.txt"));
+		FileInputStream fis = new FileInputStream(new File(path+"//User.json"));
 		
 		JsonFactory jf = new JsonFactory();
 	    JsonParser jp = jf.createParser(fis);
@@ -68,7 +68,7 @@ public class UserFileController {
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		
 		try {
-			PrintWriter wr = new PrintWriter(path+"//User.txt");
+			PrintWriter wr = new PrintWriter(path+"//User.json");
 			wr.close();
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -80,7 +80,7 @@ public class UserFileController {
 
 				BufferedWriter writer = null;
 				try {
-					writer = new BufferedWriter(new FileWriter(path + "//User.txt", true));
+					writer = new BufferedWriter(new FileWriter(path + "//User.json", true));
 					writer.write(s);
 					writer.newLine();
 					writer.close();

@@ -1,8 +1,9 @@
-app.controller('userController', ['$scope', '$window', '$location', '$cookies', '$route', '$filter', 'messageFactory', 'userFactory', 'subforumFactory', 'themeFactory', function($scope, $window, $location, $cookies, $route, $filter,
-		messageFactory, userFactory, subforumFactory, themeFactory){
+app.controller('userController', ['$scope', '$window', '$location', '$cookies', '$route', '$filter', 'messageFactory', 'userFactory', 
+           'subforumFactory', 'themeFactory', 'commentFactory', function($scope, $window, $location, $cookies, $route, $filter,
+           messageFactory, userFactory, subforumFactory, themeFactory, commentFactory){
 
 	if($cookies.get("activeUser") == null || $cookies.get("activeUser") == undefined){
-		$window.location.href = "http://localhost:8080/Podforum/#/login";
+		$window.location.href = "http://localhost:8080/Podforum/#/";
 	}else{
 		$scope.activeUser = $cookies.getObject("activeUser");
 	}
@@ -13,15 +14,22 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	$scope.followedSubforums = [];
 	$scope.themes = [];
 	$scope.savedThemes = [];
+	$scope.comments = [];
+	$scope.savedComments = [];
 	$scope.showTableInbox = true;
 	$scope.emptyInbox = false;
 	
 	$scope.message = {	"sender" : $scope.activeUser.username, "receiver" : null, "content" : null, "read" : false }
 	$scope.newSub = { "name" : null, "description" : null, "rules" : null, "responibleModerator" : $scope.activeUser.username}
 	$scope.subforumDetail = null;
+	$scope.themeDetail = null;
 	var datum = new Date();
 	var noviDatum = $filter('date')(datum, "dd-MM-yyyy");
-	$scope.newTheme = { "subforum" : $scope.subforumDetail, "name" : null, "type" : null, "author" : $scope.activeUser.username, "comments" : null, "content" : null, "creatingDate" : noviDatum, "likes" : 0, "dislikes" : 0 }
+	$scope.newTheme = { "subforum" : $scope.subforumDetail, "name" : null, "type" : null, "author" : $scope.activeUser.username, 
+			"comments" : null, "content" : null, "creatingDate" : noviDatum, "likes" : 0, "dislikes" : 0 }
+	$scope.newComment = { "theme" : $scope.themeDetail, "author" : $scope.activeUser.username, "creatingDate" : noviDatum, "parent" : null,
+			"children" : null, "text" : null, "likes" : 0, "dislikes" : 0, "changed" : false, "deleted" : false}
+	
 	$scope.viewInbox = false;
 	$scope.newMessage = false;
 	$scope.editProfile = false;
@@ -29,6 +37,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	$scope.newSubforum = false;
 	$scope.viewFollowedSubforums = false;
 	$scope.subforumDetails = false;
+	$scope.themeDetails = false;
 	
 	$scope.goToSubforum = function() {
 		subforumFactory.getSubforums().success(function(data){
@@ -70,6 +79,29 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		themeFactory.getSavedThemes($scope.activeUser.username).success(function(data){
 			$scope.savedThemes = data;
 		})
+	}
+	$scope.openTheme = function(theme){
+		$scope.themeDetails = true;
+		$scope.themeDetail = theme;
+		commentFactory.getComments(theme.name).success(function(data){
+			$scope.comments = data;
+		});
+	}
+	$scope.createNewComment = function(){
+		if(!$scope.newCommentText){
+			toast('Morate uneti tekst komentara');
+		}else{
+			$scope.newComment.theme = $scope.themeDetail;
+			$scope.newComment.text = $scope.newCommentText;
+			commentFactory.addComment($scope.newComment).success(function(data){
+				if(data == "Prokomentarisana tema"){
+					toast(data);
+					$scope.comments.push($scope.newComment);
+					$scope.newCommentText = null;
+				}
+			});
+			$scope.openTheme($scope.themeDetail);
+		}
 	}
 	$scope.createNewTheme = function(){
 		if(!$scope.newTheme.name){
@@ -163,6 +195,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 						$scope.themes.splice(i,1);
 				}
 			});
+			$scope.themeDetails = false;
 		}else if($scope.activeUser.username == theme.subforum.responibleModerator){
 			themeFactory.deleteTheme(theme).success(function(data){
 				toast(data);
@@ -171,6 +204,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 						$scope.themes.splice(i,1);
 				}
 			});
+			$scope.themeDetails = false;
 		}else if($scope.activeUser.username == theme.author){
 			themeFactory.deleteTheme(theme).success(function(data){
 				toast(data);
@@ -179,9 +213,19 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 						$scope.themes.splice(i,1);
 				}
 			});
+			$scope.themeDetails = false;
 		}else{
 			toast('Ne mozete obrisati temu');
 		}
+		
+		/*$scope.clearSc = function() {
+			if (confirm('Da li ste sigurni?') == true) {
+		    	shoppingCartFactory.clearSc().success(function(data) {
+		    		$scope.sc = {};
+		    		$scope.total = 0.0;
+		    	});
+			}
+	    };*/
 	}
 	$scope.cancelNewTheme = function(){
 		themeFactory.getThemes($scope.subforumDetail.name).success(function(data){
@@ -291,7 +335,6 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$scope.viewInbox = false;
 		$scope.newMessage = false;
 		$scope.editProfile = true;
-		$scope.viewSubforum = false;
 		userFactory.getUsers($scope.activeUser.username).success(function(data){
 			$scope.users = data;
 		});
@@ -330,14 +373,13 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	}
 	$scope.logout = function() {
 		$cookies.remove("activeUser");
-		$location.path('/login');
+		$location.path('/');
 	} 	 	
 	$scope.goToInbox = function() {
 		$scope.subforumDetails = false;
 		$scope.viewFollowedSubforums = false;
 		$scope.viewSubforum = false;
 		$scope.newSubforum = false;
-		$scope.viewSubforum = false;
 		$scope.editProfile = false;
 		$scope.viewInbox = true;
 		$scope.newMessage = false;
@@ -354,7 +396,6 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$scope.viewFollowedSubforums = false;
 		$scope.viewSubforum = false;
 		$scope.newSubforum = false;
-		$scope.viewSubforum = false;
 		$scope.editProfile = false;
 		$scope.viewInbox = false;
 		$scope.newMessage = true;
@@ -398,7 +439,6 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		$scope.posaljiDugme = true;
 	}
 	$scope.odgovori = function(messageInbox){
-		$scope.viewSubforum = false;
 		$scope.newSubforum = false;
 		$scope.viewSubforum = false;
 		$scope.editProfile = false;
@@ -412,7 +452,6 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	$scope.detalji = function(messageInbox){
 		$scope.viewSubforum = false;
 		$scope.newSubforum = false;
-		$scope.viewSubforum = false;
 		$scope.editProfile = false;
 		messageInbox.read = true;
 		messageFactory.read(messageInbox);
@@ -468,9 +507,7 @@ app.controller('loginController', [ '$scope', '$location', '$cookies', '$localSt
 			});
 		}
 	}
-	$scope.register = function(){
-		$location.path('/registration');
-	}	 
+ 
 }]);
 
 app.controller('registrationController', [ '$scope', '$filter', '$location', 'registrationService', 'userFactory',  function($scope, $filter, $location, registrationService, userFactory){	
@@ -489,7 +526,7 @@ app.controller('registrationController', [ '$scope', '$filter', '$location', 're
 			userFactory.addUser($scope.user).success(function(data){
 				if(data == "Korisnik uspesno registrovan"){
 					toast(data);
-					$location.path('/login');
+					$location.path('/');
 				}else{
 					toast(data);
 				}		

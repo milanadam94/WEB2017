@@ -32,11 +32,11 @@ public class SubforumFileController {
 		String path = FilePaths.getPath(config).getPath();
 		ObjectMapper mapper = new ObjectMapper();
 		
-		File varTmpDir = new File(path+"//Subforum.txt");
+		File varTmpDir = new File(path+"//Subforum.json");
 		boolean exists = varTmpDir.exists();
 		if(!exists){
 			try {
-				PrintWriter wr = new PrintWriter(path+"//Subforum.txt");
+				PrintWriter wr = new PrintWriter(path+"//Subforum.json");
 				wr.close();
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
@@ -44,7 +44,7 @@ public class SubforumFileController {
 		}
 		
 		
-		FileInputStream fis = new FileInputStream(new File(path+"//Subforum.txt"));
+		FileInputStream fis = new FileInputStream(new File(path+"//Subforum.json"));
 		
 		JsonFactory jf = new JsonFactory();
 	    JsonParser jp = jf.createParser(fis);
@@ -67,7 +67,7 @@ public class SubforumFileController {
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		
 		try {
-			PrintWriter wr = new PrintWriter(path+"//Subforum.txt");
+			PrintWriter wr = new PrintWriter(path+"//Subforum.json");
 			wr.close();
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -79,7 +79,7 @@ public class SubforumFileController {
 
 				BufferedWriter writer = null;
 				try {
-					writer = new BufferedWriter(new FileWriter(path + "//Subforum.txt", true));
+					writer = new BufferedWriter(new FileWriter(path + "//Subforum.json", true));
 					writer.write(s);
 					writer.newLine();
 					writer.close();

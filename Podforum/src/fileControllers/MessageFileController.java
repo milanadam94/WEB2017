@@ -32,11 +32,11 @@ public class MessageFileController {
 		String path = FilePaths.getPath(config).getPath();
 		ObjectMapper mapper = new ObjectMapper();
 		
-		File varTmpDir = new File(path+"//Message.txt");
+		File varTmpDir = new File(path+"//Message.json");
 		boolean exists = varTmpDir.exists();
 		if(!exists){
 			try {
-				PrintWriter wr = new PrintWriter(path+"//Message.txt");
+				PrintWriter wr = new PrintWriter(path+"//Message.json");
 				wr.close();
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
@@ -44,7 +44,7 @@ public class MessageFileController {
 		}
 		
 		
-		FileInputStream fis = new FileInputStream(new File(path+"//Message.txt"));
+		FileInputStream fis = new FileInputStream(new File(path+"//Message.json"));
 		
 		JsonFactory jf = new JsonFactory();
 	    JsonParser jp = jf.createParser(fis);
@@ -67,7 +67,7 @@ public class MessageFileController {
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		
 		try {
-			PrintWriter wr = new PrintWriter(path+"//Message.txt");
+			PrintWriter wr = new PrintWriter(path+"//Message.json");
 			wr.close();
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -79,7 +79,7 @@ public class MessageFileController {
 
 				BufferedWriter writer = null;
 				try {
-					writer = new BufferedWriter(new FileWriter(path + "//Message.txt", true));
+					writer = new BufferedWriter(new FileWriter(path + "//Message.json", true));
 					writer.write(s);
 					writer.newLine();
 					writer.close();

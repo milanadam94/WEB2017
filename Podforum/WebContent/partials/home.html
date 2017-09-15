@@ -1,4 +1,78 @@
 
 <div ng-controller="homeController">
-	<p><b>GGGGG</b></p>
+	<nav class="navbar navbar-inverse">
+  		<div class="container-fluid">
+    		<div class="navbar-header">
+      			<a class="btn btn-second btn-lg" href=""><span class="glyphicon glyphicon-home"></span>&nbsp;Pocetna</a>
+    		</div>
+    		<ul class="nav navbar-nav navbar-right">
+			      <li><a class="btn btn-primary btn-lg" href="" ng-click="login()"><span class="glyphicon glyphicon-log-in">&nbsp;</span>Prijava</a></li>
+			      <li><a class="btn btn-primary btn-lg" href="" ng-click="register()"><span class="glyphicon glyphicon-registration-mark">&nbsp;</span>Registracija</a></li>
+			</ul>
+    	</div>
+	</nav>
+	
+	<div ng-show="viewSubforum">
+		<div class="container">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Podforumi: </label>
+					</div>
+						<table class="table table-striped">
+				    		<thead>
+				      			<tr>
+				        			<th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Detalji</th>
+				      			</tr>
+				     		</thead>
+				     		<tbody>
+						     	<tr ng-repeat="subforum in subforums">
+						     		<td> {{ subforum.name }} </td>
+						     		<td> {{ subforum.description }} </td>
+						     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
+						     		<td> <button type="submit" class="btn btn-success buttons" ng-click="details(subforum)"><span style="font-size:large;">Detalji</span></button> </td>
+						     	</tr>
+				     		</tbody>
+						</table>
+					
+				</div>
+			</div>	
+		</div>
+	</div>
+	
+	<div ng-show="subforumDetails">
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h3> {{ subforumDetail.name }} </h3>&nbsp;&nbsp;&nbsp;
+				<img src="icons/{{subforumDetail.iconPath}}" alt="icon" height="48px" width="48px">
+				<span flex></span>
+			</div>
+		</md-toolbar>
+		<br>
+		<div class="container">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Teme: </label>
+					</div>
+						<table class="table table-striped">
+				    		<thead>
+                            	<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th></tr>
+                            </thead>
+                                    <tbody>
+                                    	<tr ng-repeat="theme in themes">
+                                    		<td> <a href="" ng-click="openTheme(theme)">{{ theme.name }}</a></td>
+                                    		<td ng-if="theme.type == 'TEXT'"> {{ theme.content }} </td>
+                                    		<td ng-if="theme.type == 'LINK'"> <a href="{{theme.content}}">{{theme.content}}</a> </td>
+                                    		<td ng-if="theme.type == 'IMAGE'"> <img alt="ikonica" src="{{theme.content}}" height="50px" width="50px"> </td>
+                                    		<td> {{ theme.author }} </td>
+                                    		<td> {{ theme.creatingDate }} </td>
+                                    	</tr>
+                                    </tbody>
+                         </table>
+                 </div>
+          	</div>
+       	</div>
+	</div>
+	
 </div>

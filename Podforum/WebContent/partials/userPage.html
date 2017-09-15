@@ -6,7 +6,6 @@
 		  left: 50%;
 		  margin: -150px 0 0 -150px;
 		}
-		
 	</style>
 </head>
 
@@ -14,17 +13,15 @@
 	<nav class="navbar navbar-inverse">
   		<div class="container-fluid">
     		<div class="navbar-header">
-      			<a class="navbar-brand" href="">Pocetna</a>
+      			<a class="btn btn-second btn-lg" href="" ng-click="" ><span class="glyphicon glyphicon-home"></span>&nbsp;Pocetna</a>
     		</div>
     		<ul class="nav navbar-nav">
-      			<li class="active"><a href="">Entiteti</a></li>
-      			<li><a href="" ng-click="goToSubforum()">Podforumi</a></li>
-      			<li><a href="">Like/Dislike</a></li>
-      			<li><a href="" ng-click="goToInbox()">Poruke</a></li>
-      			<li><a href="" ng-click="editUser()" ng-if="isAdministrator()">Promena tipa</a></li>
+      			<li><a href="" class="btn btn-primary btn-lg" ng-click="goToSubforum()"><span class="glyphicon glyphicon-th-list"></span>&nbsp;Podforumi</a></li>
+      			<li><a href="" class="btn btn-second btn-lg" ng-click="goToInbox()"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Poruke</a></li>
+      			<li><a href="" class="btn btn-primary btn-lg" ng-click="editUser()" ng-if="isAdministrator()"><span class="glyphicon glyphicon-user"></span>&nbsp;Promena tipa</a></li>
     		</ul>
     		<ul class="nav navbar-nav navbar-right">
-			      <li><a href="" ng-click="logout()">Odjava</a></li>
+			      <li><a href="" class="btn btn-primary btn-lg" ng-click="logout()"> <span class="glyphicon glyphicon-log-out"></span> Odjava</a></li>
 			</ul>
     	</div>
 	</nav>
@@ -41,7 +38,7 @@
 					<div class="panel heading clearfix">
 						<label> Podforumi: </label>
 					</div>
-						<table class="table table-striped">
+						<table class="table table-striped" >
 				    		<thead>
 				      			<tr>
 				        			<th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Zaprati</th><th ng-if=!isUser()>Obrisi</th><th>Detalji</th>
@@ -52,9 +49,9 @@
 						     		<td> {{ subforum.name }} </td>
 						     		<td> {{ subforum.description }} </td>
 						     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
-						     		<td> <button type="submit" class="btn btn-info" ng-click="followSub(subforum)"><span style="font-size:large;">Zaprati</span></button> </td>
-						     		<td ng-if=!isUser()> <button type="submit" class="btn btn-warning" ng-click="deleteSub(subforum)"><span style="font-size:large;">Obrisi</span></button></td>
-						     		<td> <button type="submit" class="btn btn-success buttons" ng-click="details(subforum)"><span style="font-size:large;">Detalji</span></button> </td>
+						     		<td> <button type="submit" class="btn btn-info btn-sm" ng-click="followSub(subforum)"><span class="glyphicon glyphicon-heart" style="font-size:large;">&nbsp;Zaprati</span></button> </td>
+						     		<td ng-if=!isUser()> <button type="submit" class="btn btn-danger btn-sm" ng-click="deleteSub(subforum)"><span class="glyphicon glyphicon-trash" style="font-size:large;">&nbsp;Obrisi</span></button></td>
+						     		<td> <button type="submit" class="btn btn-success btn-sm" ng-click="details(subforum)"><span style="font-size:large;" class="glyphicon glyphicon-cog">&nbsp;Detalji</span></button> </td>
 						     	</tr>
 				     		</tbody>
 						</table>
@@ -71,13 +68,14 @@
 					</div>
 						<table class="table table-striped">
 				    		<thead>
-                            	<tr><th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Detalji</th></tr>
+                            	<tr><th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Otprati<th>Detalji</th></tr>
                             </thead>
                             <tbody>
                                     	<tr ng-repeat="subforum in followedSubforums">
 				     		<td> {{ subforum.name }} </td>
 				     		<td> {{ subforum.description }} </td>
 				     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
+				     		<td> <button type="submit" class="btn btn-danger" ng-click="unfollow(subforum)"><span style="font-size:large;">Otprati</span></button> </td>
 				     		<td> <button type="submit" class="btn btn-success" ng-click="details(subforum)"><span style="font-size:large;">Detalji</span></button> </td>
 				     					</tr>
 				     		</tbody>
@@ -89,11 +87,10 @@
 		<md-toolbar>
 			<div class="md-toolbar-tools">
 				<h3> {{ subforumDetail.name }} </h3>&nbsp;&nbsp;&nbsp;
-				<!--  <img src="http://imgur.com/gallery/81qU4Zo" alt="icon" height="32px" width="32px">-->
 				<img src="icons/{{subforumDetail.iconPath}}" alt="icon" height="48px" width="48px">
 				<span flex></span>
-				<button type="submit" class="btn btn-info" data-toggle="modal" data-target="#newThemeModal"><span style="font-size:large;">Nova tema</span></button>
-				<md-button aria-label="Settings" ng-click="logOut()"><md-title>Log out</md-title></md-button>
+				<button type="submit" class="btn btn-info" data-toggle="modal" data-target="#newThemeModal"><span style="font-size:large;" class="glyphicon glyphicon-plus">&nbsp;Nova tema</span></button>
+				
 			</div>
 		</md-toolbar>
 		<br>
@@ -103,21 +100,21 @@
 					<div class="panel heading clearfix">
 						<label> Teme: </label>
 					</div>
-						<table class="table table-striped">
+						<table class="table table-striped" >
 				    		<thead>
-                            	<tr><th>Naslov</th><th>Tip</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>Snimi</th><th>Izmeni</th><th>Obrisi</th></tr>
+                            	<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>Snimi</th><th>Izmeni</th><th>Obrisi</th></tr>
                             </thead>
                                     <tbody>
                                     	<tr ng-repeat="theme in themes">
-                                    		<td> {{ theme.name }} </td>
-                                    		<td> {{ theme.type }} </td>
-                                    		<td ng-if="theme.type != 'IMAGE'"> {{ theme.content }} </td>
+                                    		<td> <a href="" ng-click="openTheme(theme)">{{ theme.name }}</a></td>
+                                    		<td ng-if="theme.type == 'TEXT'"> {{ theme.content }} </td>
+                                    		<td ng-if="theme.type == 'LINK'"> <a href="{{theme.content}}">{{theme.content}}</a> </td>
                                     		<td ng-if="theme.type == 'IMAGE'"> <img alt="ikonica" src="{{theme.content}}" height="50px" width="50px"> </td>
                                     		<td> {{ theme.author }} </td>
                                     		<td> {{ theme.creatingDate }} </td>
-                                    		<td> <button type="submit" class="btn btn-success" ng-click="saveTheme(theme)"><span style="font-size:large;">Snimi</span></button> </td>
-                                    		<td> <button type="submit" class="btn btn-warning" ng-click="editTheme(theme)" data-toggle="modal" data-target="#editThemeModal"><span style="font-size:large;">Izmeni</span></button> </td>
-                                    		<td> <button type="submit" class="btn btn-danger" ng-click="deleteTheme(theme)"><span style="font-size:large;">Obrisi</span></button> </td>
+                                    		<td> <button type="submit" class="btn btn-success" ng-click="saveTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-save">&nbsp;Snimi</span></button> </td>
+                                    		<td> <button type="submit" class="btn btn-warning" ng-click="editTheme(theme)" data-toggle="modal" data-target="#editThemeModal"><span style="font-size:large;" class="glyphicon glyphicon-edit">&nbsp;Izmeni</span></button> </td>
+                                    		<td> <button type="submit" class="btn btn-danger" ng-click="deleteTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-trash">&nbsp;Obrisi</span></button> </td>
                                     	</tr>
                                     </tbody>
                          </table>
@@ -125,6 +122,80 @@
           	</div>
        	</div>
 	</div>
+	
+	<div ng-show="themeDetails">
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h3> {{ themeDetail.name }} </h3>&nbsp;&nbsp;&nbsp;
+				<h3 ng-if="themeDetail.type == 'TEXT'"> {{ themeDetail.content }} </h3>
+				<img src="{{themeDetail.content}}" alt="icon" height="50px" width="50px" ng-if="themeDetail.type == 'IMAGE'">
+				<a href="{{themeDetail.content}}" ng-if="themeDetail.type == 'LINK'">{{themeDetail.content}}</a>
+			</div>
+		</md-toolbar>
+		<br>
+		<div class="form-row">
+			<div class="form-group col-sm-8">
+				<div class="col-sm-2">
+					<label class="control-label"> Komentar: </label>  
+				</div>
+				<div class="col-sm-10">
+					<input type = "text" class="form-control" id="name" ng-model="newCommentText" placeholder="Prokomentarišite temu"> 
+				</div>
+			</div>
+			<div class="form-group col-sm-2">
+			    <button type="submit" class="btn btn-primary btn-sm" ng-click="createNewComment()"><span class="glyphicon glyphicon-comment" style="font-size:large;"> Komentar </span></button>                  
+		    </div>
+		</div>
+		<br><br> 
+        
+        <div ng-repeat="comment in comments">
+        	<div class="form-row">
+        		<hr style="border-style: inset;border-width: 1px;">
+				<div class="form-group col-sm-12">
+					<div class="form-group col-sm-2">
+						<label>Autor: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.author}} </label>  
+					</div>
+					<div class="form-group col-sm-2">
+						<label>Datum: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 22px"> {{comment.creatingDate}} </label> 
+					</div>
+					<div class="form-group col-sm-3">
+						<label>Tekst: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.text}} </label> 
+					</div>
+					<div class="form-group col-sm-2">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.likes}} </label> 
+						<button type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-thumbs-up" style="font-size:large;">&nbsp;Like</span></button>
+					</div>
+					<div class="form-group col-sm-2">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.dislikes}} </label> 
+						<button type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-thumbs-down" style="font-size:large;">&nbsp;Dislike</span></button>
+					</div>
+					<div class="form-group col-sm-1">
+						<a href="" ng-if="comment.changed == false"><span style="font-size: 40px;" class="glyphicon glyphicon-star-empty"></span></a>
+						<a href="" ng-if="comment.changed == true"><span style="font-size: 40px;" class="glyphicon glyphicon-star"></span></a>
+					</div> 
+				</div>
+				
+				<div class="form-group col-sm-12">
+					<div class="form-group col-sm-4">
+						<button type="submit" class="btn btn-success" ng-click="saveComment(comment)"><span style="font-size:large;" class="glyphicon glyphicon-save">&nbsp;Snimi</span></button> 
+	                    <button type="submit" class="btn btn-warning" ng-click="editComment(comment)" data-toggle="modal" data-target="#editCommentModal"><span style="font-size:large;" class="glyphicon glyphicon-edit">&nbsp;Izmeni</span></button>
+	                    <button type="submit" class="btn btn-danger" ng-click="deleteComment(comment)"><span style="font-size:large;" class="glyphicon glyphicon-trash">&nbsp;Obrisi</span></button>
+					</div>
+					<div class="form-group col-sm-4">	
+						<input type = "text" class="form-control" id="name" ng-model="newSubcommentText" placeholder="Odgovorite"> 
+					</div>
+					<div class="form-group col-sm-2">	
+						<button type="submit" class="btn btn-primary btn-sm" ng-click="createNewSubcomment()"><span class="glyphicon glyphicon-comment" style="font-size:large;"> Odgovor </span></button>                  
+					</div>
+				</div>
+				<hr style="border-style: inset;border-width: 1px;">
+			</div>
+		</div>         
+	</div>
+		
 	<div ng-show="newSubforum" id="newSubforum">
 		<div class="form-group">
 			<label class="control-label"> Naziv: </label>  

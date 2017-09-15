@@ -14,8 +14,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import fileControllers.CommentFileController;
 import fileControllers.ThemeFileController;
 import fileControllers.UserFileController;
+import models.Comment;
 import models.Theme;
 import models.User;
 
@@ -53,6 +55,8 @@ public class ThemeController {
 	public String editTheme(Theme theme) throws FileNotFoundException, IOException{
 		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
 		ArrayList<User> users = UserFileController.readUser(config);
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		
 		for(int i = 0; i < users.size(); i++){
 			ArrayList<Theme> savedThemes = users.get(i).getThemes();
 			for(int j = 0; j < savedThemes.size(); j++){
@@ -73,6 +77,16 @@ public class ThemeController {
 			}
 		}
 		ThemeFileController.writeTheme(config, themes);
+		
+		for(int i = 0; i < comments.size(); i++){
+			if(comments.get(i).getTheme().getName().equals(theme.getName())){
+				comments.get(i).getTheme().setType(theme.getType());
+				comments.get(i).getTheme().setContent(theme.getContent());
+				comments.get(i).getTheme().setCreatingDate(theme.getCreatingDate());
+			}
+		}
+		CommentFileController.writeComment(config, comments);
+		
 		return "Uspesno izmenjena tema";
 	}
 	
@@ -82,6 +96,8 @@ public class ThemeController {
 	public String deleteTheme(Theme theme) throws FileNotFoundException, IOException{
 		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
 		ArrayList<User> users = UserFileController.readUser(config);
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		
 		for(int i = 0; i < users.size(); i++){
 			ArrayList<Theme> savedThemes = users.get(i).getThemes();
 			for(int j = 0; j < savedThemes.size(); j++){
@@ -100,6 +116,14 @@ public class ThemeController {
 			}
 		}
 		ThemeFileController.writeTheme(config, themes);
+		
+		for(int i = 0; i < comments.size(); i++){
+			if(comments.get(i).getTheme().getName().equals(theme.getName())){
+				comments.remove(i);
+			}
+		}
+		CommentFileController.writeComment(config, comments);
+		
 		return "Uspesno obrisana tema";
 	}
 	

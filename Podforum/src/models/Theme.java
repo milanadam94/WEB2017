@@ -8,11 +8,13 @@ public class Theme {
 	private String name;
 	private ThemeType type;
 	private String author;
-	private ArrayList<Comment> comments;
+	private ArrayList<Comment> comments = new ArrayList<Comment>();
 	private String content;
 	private String creatingDate;
 	private int likes;
 	private int dislikes;
+	private ArrayList<String> usersLiked = new ArrayList<String>();
+	private ArrayList<String> usersDisliked = new ArrayList<String>();
 	
 	public Theme() {
 		super();
@@ -73,6 +75,19 @@ public class Theme {
 		this.comments = comments;
 	}
 
+	public void addComment(Comment comment){
+		if(comments == null){
+			this.comments = new ArrayList<Comment>();
+			this.comments.add(comment);
+		}else{
+			this.comments.add(comment);
+		}
+	}
+	
+	public void removeComment(Comment comment){
+		comments.remove(comment);
+	}
+	
 	public String getContent() {
 		return content;
 	}
@@ -104,7 +119,46 @@ public class Theme {
 	public void setDislikes(int dislikes) {
 		this.dislikes = dislikes;
 	}
+
+	public ArrayList<String> getUsersLiked() {
+		return usersLiked;
+	}
+
+	public void setUsersLiked(ArrayList<String> usersLiked) {
+		this.usersLiked = usersLiked;
+	}
+
+	public void addUserLiked(String username) {
+		if(usersLiked == null){
+			usersLiked = new ArrayList<String>();
+			usersLiked.add(username);
+		}else{
+			usersLiked.add(username);
+		}
+	}
 	
+	public void removeUserLiked(String username){
+		usersLiked.remove(username);
+	}
 	
+	public ArrayList<String> getUsersDisliked() {
+		return usersDisliked;
+	}
+
+	public void setUsersDisliked(ArrayList<String> usersDisliked) {
+		this.usersDisliked = usersDisliked;
+	}
 	
+	public void addUserDisliked(String username) {
+		if(usersDisliked == null){
+			usersDisliked = new ArrayList<String>();
+			usersDisliked.add(username);
+		}else{
+			usersDisliked.add(username);
+		}
+	}
+	
+	public void removeUserDisliked(String username){
+		usersDisliked.remove(username);
+	}
 }

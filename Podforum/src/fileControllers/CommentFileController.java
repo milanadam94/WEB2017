@@ -19,24 +19,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import models.Theme;
+import models.Comment;
 
-public class ThemeFileController {
+public class CommentFileController {
 
-	public ThemeFileController() {
+	public CommentFileController() {
 		
 	}
 	
-	public static ArrayList<Theme> readTheme(ServletConfig config)throws FileNotFoundException, IOException{
-		ArrayList<Theme> themes = new ArrayList<Theme>();
+	public static ArrayList<Comment> readComment(ServletConfig config)throws FileNotFoundException, IOException{
+		ArrayList<Comment> comments = new ArrayList<Comment>();
 		String path = FilePaths.getPath(config).getPath();
 		ObjectMapper mapper = new ObjectMapper();
 		
-		File varTmpDir = new File(path+"//Theme.json");
+		File varTmpDir = new File(path+"//Comment.json");
 		boolean exists = varTmpDir.exists();
 		if(!exists){
 			try {
-				PrintWriter wr = new PrintWriter(path+"//Theme.json");
+				PrintWriter wr = new PrintWriter(path+"//Comment.json");
 				wr.close();
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
@@ -44,7 +44,7 @@ public class ThemeFileController {
 		}
 		
 		
-		FileInputStream fis = new FileInputStream(new File(path+"//Theme.json"));
+		FileInputStream fis = new FileInputStream(new File(path+"//Comment.json"));
 		
 		JsonFactory jf = new JsonFactory();
 	    JsonParser jp = jf.createParser(fis);
@@ -52,34 +52,34 @@ public class ThemeFileController {
 	    jp.nextToken();
 	    
 	    while(jp.hasCurrentToken()){
-	    	Theme theme = jp.readValueAs(Theme.class);
-	    	themes.add(theme);
+	    	Comment comment = jp.readValueAs(Comment.class);
+	    	comments.add(comment);
 	    	jp.nextToken();
 	    }
 		
-		return themes;
+		return comments;
 	}
 	
 	
-	public static synchronized void writeTheme(ServletConfig config, ArrayList<Theme> themes) {
+	public static synchronized void writeComment(ServletConfig config, ArrayList<Comment> comments) {
 
 		String path = FilePaths.getPath(config).getPath();
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		
 		try {
-			PrintWriter wr = new PrintWriter(path+"//Theme.json");
+			PrintWriter wr = new PrintWriter(path+"//Comment.json");
 			wr.close();
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
 		
-		for (Theme theme : themes) {
+		for (Comment comment : comments) {
 			try {
-				String s = ow.writeValueAsString(theme);
+				String s = ow.writeValueAsString(comment);
 
 				BufferedWriter writer = null;
 				try {
-					writer = new BufferedWriter(new FileWriter(path + "//Theme.json", true));
+					writer = new BufferedWriter(new FileWriter(path + "//Comment.json", true));
 					writer.write(s);
 					writer.newLine();
 					writer.close();
