@@ -24,11 +24,13 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	$scope.subforumDetail = null;
 	$scope.themeDetail = null;
 	var datum = new Date();
-	var noviDatum = $filter('date')(datum, "dd-MM-yyyy");
+	var noviDatum = $filter('date')(datum, "dd-MM-yyyy HH:mm");
 	$scope.newTheme = { "subforum" : $scope.subforumDetail, "name" : null, "type" : null, "author" : $scope.activeUser.username, 
 			"comments" : null, "content" : null, "creatingDate" : noviDatum, "likes" : 0, "dislikes" : 0 }
 	$scope.newComment = { "theme" : $scope.themeDetail, "author" : $scope.activeUser.username, "creatingDate" : noviDatum, "parent" : null,
-			"children" : null, "text" : null, "likes" : 0, "dislikes" : 0, "changed" : false, "deleted" : false}
+			"children" : [], "text" : null, "likes" : 0, "dislikes" : 0, "changed" : false, "deleted" : false}
+	$scope.newSubcomment = { "theme" : $scope.themeDetail, "author" : $scope.activeUser.username, "creatingDate" : noviDatum, "parent" : null,
+			"children" : [], "text" : null, "likes" : 0, "dislikes" : 0, "changed" : false, "deleted" : false}
 	
 	$scope.viewInbox = false;
 	$scope.newMessage = false;
@@ -78,7 +80,8 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		});
 		themeFactory.getSavedThemes($scope.activeUser.username).success(function(data){
 			$scope.savedThemes = data;
-		})
+		});
+		$scope.themeDetails = false;
 	}
 	$scope.openTheme = function(theme){
 		$scope.themeDetails = true;
@@ -102,6 +105,82 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 			});
 			$scope.openTheme($scope.themeDetail);
 		}
+	}
+	$scope.subcomment = {};
+	$scope.createNewSubcomment = function(comment){
+		console.log(comment);
+		if(!$scope.subcomment.com){
+			toast('Morate uneti tekst podkomentara');
+		}else{
+			$scope.newSubcomment.theme = $scope.themeDetail;
+			$scope.newSubcomment.text = $scope.subcomment.com;
+			for( i = 0; i < $scope.comments.length; i++){
+				if($scope.comments[i].text == comment.text){
+					$scope.comments[i].children.push($scope.newSubcomment);
+					commentFactory.addSubcomment($scope.comments[i]).success(function(data){
+						if(data == "Podkomentar"){
+							toast(data);
+						}
+					});
+					$scope.subcomment.com = null;
+					//$scope.openTheme($scope.themeDetail);
+				}
+			}
+		}
+	}
+	$scope.editComment = function(comment){
+		var date = new Date();
+		var newDate = $filter('date')(date, "dd-MM-yyyy HH:mm");
+		$scope.editCommentModal = { "theme" : comment.theme, "author" : comment.author, "creatingDate" : noviDatum, "parent" : comment.parent,
+				"children" : comment.children, "text" : comment.text, "likes" : comment.likes, "dislikes" : comment.dislikes, "changed" : true, "deleted" : false}
+		$scope.oldCom = comment.text;
+	}
+	$scope.cancelEditComment = function(){
+		$scope.editCommentModal = null;
+	}
+	$scope.saveEditComment = function(){
+		console.log($scope.editCommentModal.text)
+		if($scope.activeUser.username == $scope.editCommentModal.author){
+			//commentFactory.editComment($scope.editCommentModal).success(function(data){
+			//	toast(data);
+				for(i = 0; i < $scope.comments.length; i++){
+					if($scope.comments[i].text == $scope.oldCom){
+						console.log($scope.comments[i].text + " " + $scope.oldCom)
+						$scope.comments[i].text == $scope.editCommentModal.text;
+						$scope.comments[i].creatingDate = $scope.editCommentModal.creatingDate;
+						$scope.comments[i].changed = $scope.editCommentModal.changed;
+					}
+				}
+			//});
+		}
+	}
+	$scope.likeTheme = function(theme){
+		themeFactory.likeTheme($scope.activeUser.username, theme).success(function(data){
+			if(data == "Tema lajkovana"){
+				for(i = 0; i < $scope.themes.length; i++){
+					if($scope.themes[i].name == theme.name){
+						$scope.themes[i].likes++;
+					}
+				}
+				toast(data);
+			}else{
+				toast(data);
+			}
+		});
+	}
+	$scope.dislikeTheme = function(theme){
+		themeFactory.dislikeTheme($scope.activeUser.username, theme).success(function(data){
+			if(data == "Tema dislajkovana"){
+				for(i = 0; i < $scope.themes.length; i++){
+					if($scope.themes[i].name == theme.name){
+						$scope.themes[i].dislikes++;
+					}
+				}
+				toast(data);
+			}else{
+				toast(data);
+			}
+		});
 	}
 	$scope.createNewTheme = function(){
 		if(!$scope.newTheme.name){

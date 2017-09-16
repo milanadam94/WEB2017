@@ -5,6 +5,10 @@ app.factory('commentFactory', function($http){
 		return $http.post('/Podforum/rest/comment/addComment', comment);
 	}
 	
+	factory.addSubcomment = function(comment){
+		return $http.post('/Podforum/rest/comment/addSubcomment', comment);
+	}
+	
 	factory.getComments = function(themeName){
 		return $http.get('/Podforum/rest/comment/getComments/' + themeName);
 	}

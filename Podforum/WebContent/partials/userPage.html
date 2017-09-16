@@ -41,7 +41,7 @@
 						<table class="table table-striped" >
 				    		<thead>
 				      			<tr>
-				        			<th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Zaprati</th><th ng-if=!isUser()>Obrisi</th><th>Detalji</th>
+				        			<th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Odgovorni moderator<th>Zaprati</th><th ng-if=!isUser()>Obrisi</th><th>Detalji</th>
 				      			</tr>
 				     		</thead>
 				     		<tbody>
@@ -49,6 +49,7 @@
 						     		<td> {{ subforum.name }} </td>
 						     		<td> {{ subforum.description }} </td>
 						     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
+						     		<td> {{ subforum.responibleModerator }} </td>
 						     		<td> <button type="submit" class="btn btn-info btn-sm" ng-click="followSub(subforum)"><span class="glyphicon glyphicon-heart" style="font-size:large;">&nbsp;Zaprati</span></button> </td>
 						     		<td ng-if=!isUser()> <button type="submit" class="btn btn-danger btn-sm" ng-click="deleteSub(subforum)"><span class="glyphicon glyphicon-trash" style="font-size:large;">&nbsp;Obrisi</span></button></td>
 						     		<td> <button type="submit" class="btn btn-success btn-sm" ng-click="details(subforum)"><span style="font-size:large;" class="glyphicon glyphicon-cog">&nbsp;Detalji</span></button> </td>
@@ -101,9 +102,9 @@
 						<label> Teme: </label>
 					</div>
 						<table class="table table-striped" >
-				    		<thead>
-                            	<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>Snimi</th><th>Izmeni</th><th>Obrisi</th></tr>
-                            </thead>
+				    		<!-- <thead>
+                            	<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>Snimi</th><th>Izmeni</th><th>Obrisi</th><th>Like</th><th>Dislike</th></tr>
+                            </thead> -->
                                     <tbody>
                                     	<tr ng-repeat="theme in themes">
                                     		<td> <a href="" ng-click="openTheme(theme)">{{ theme.name }}</a></td>
@@ -115,6 +116,14 @@
                                     		<td> <button type="submit" class="btn btn-success" ng-click="saveTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-save">&nbsp;Snimi</span></button> </td>
                                     		<td> <button type="submit" class="btn btn-warning" ng-click="editTheme(theme)" data-toggle="modal" data-target="#editThemeModal"><span style="font-size:large;" class="glyphicon glyphicon-edit">&nbsp;Izmeni</span></button> </td>
                                     		<td> <button type="submit" class="btn btn-danger" ng-click="deleteTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-trash">&nbsp;Obrisi</span></button> </td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.likes}} </label>&nbsp;
+                                    			<button type="submit" class="btn btn-primary" ng-click="likeTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-thumbs-up">&nbsp;Like</span></button> 	
+                                    		</td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.dislikes}} </label>&nbsp;
+                                    			<button type="submit" class="btn btn-default" ng-click="dislikeTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-thumbs-down">&nbsp;Dislike</span></button> 
+                                    		</td>
                                     	</tr>
                                     </tbody>
                          </table>
@@ -185,14 +194,15 @@
 	                    <button type="submit" class="btn btn-danger" ng-click="deleteComment(comment)"><span style="font-size:large;" class="glyphicon glyphicon-trash">&nbsp;Obrisi</span></button>
 					</div>
 					<div class="form-group col-sm-4">	
-						<input type = "text" class="form-control" id="name" ng-model="newSubcommentText" placeholder="Odgovorite"> 
+						<input type = "text" class="form-control" ng-model="subcomment.com" placeholder="Odgovorite"> 
 					</div>
 					<div class="form-group col-sm-2">	
-						<button type="submit" class="btn btn-primary btn-sm" ng-click="createNewSubcomment()"><span class="glyphicon glyphicon-comment" style="font-size:large;"> Odgovor </span></button>                  
+						<button type="submit" class="btn btn-primary btn-sm" ng-click="createNewSubcomment(comment)"><span class="glyphicon glyphicon-comment" style="font-size:large;"> Odgovor </span></button>                  
 					</div>
 				</div>
 				<hr style="border-style: inset;border-width: 1px;">
 			</div>
+			<div> <subcomment /></div>
 		</div>         
 	</div>
 		
@@ -369,6 +379,32 @@
 			      	<div class="modal-footer">
 			      		<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="cancelEditTheme()"><span style="font-size:large;">Izađi</span></button>
 			        	<button type="submit" class="btn btn-primary pull-left" ng-click="saveEditTheme()" ><span style="font-size:large;">Izmeni</span></button>
+			      	</div>
+				</div>
+			</div>
+		</div>
+	
+	<div id="editCommentModal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+			        	<button type="button" class="close" data-dismiss="modal">&times;</button>
+			        	<h3 class="modal-title">Izmena komentara</h3>
+			      	</div>
+			      	<div class="modal-body">
+			      		<div class="form-group">
+							<label class="control-label" for="name">Autor:</label>
+							<input type="text" class="form-control" id="username" ng-model="editCommentModal.author" disabled>
+						</div>
+						<div class="form-group">
+							<label class="control-label" for="content">Tekst:</label>
+							<input type="text" class="form-control" id="content" ng-model="editCommentModal.text">
+						</div>
+						
+			      	</div>
+			      	<div class="modal-footer">
+			      		<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="cancelEditComment()"><span style="font-size:large;">Izađi</span></button>
+			        	<button type="submit" class="btn btn-primary pull-left" ng-click="saveEditComment()" ><span style="font-size:large;">Izmeni</span></button>
 			      	</div>
 				</div>
 			</div>

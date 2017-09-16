@@ -24,6 +24,14 @@ app.factory('themeFactory', function($http){
 	factory.saveTheme = function(username, theme){
 		return $http.post('/Podforum/rest/theme/saveTheme/' + username, theme);
 	}
+	
+	factory.likeTheme = function(username, theme){
+		return $http.post('/Podforum/rest/theme/likeTheme/' + username, theme);
+	}
 
+	factory.dislikeTheme = function(username, theme){
+		return $http.post('/Podforum/rest/theme/dislikeTheme/' + username, theme);
+	}
+	
 	return factory;
 });

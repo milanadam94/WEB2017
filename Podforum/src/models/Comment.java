@@ -8,7 +8,7 @@ public class Comment {
 	private String author;
 	private String creatingDate;
 	private Comment parent;
-	private ArrayList<Comment> children;
+	private ArrayList<Comment> children = new ArrayList<Comment>();
 	private String text;
 	private int likes;
 	private int dislikes;

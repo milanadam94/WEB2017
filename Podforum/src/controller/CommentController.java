@@ -48,6 +48,24 @@ public class CommentController {
 		return "Prokomentarisana tema";
 	}
 	
+	@POST
+	@Path("/addSubcomment")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String addSubcomment(Comment comment) throws FileNotFoundException, IOException{
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
+		
+		for(int i = 0; i < comments.size(); i++){
+			if(comments.get(i).getText().equals(comment.getText())){
+				comments.get(i).getChildren().add(comment.getChildren().get(comment.getChildren().size() - 1));
+				break;
+			}
+		}
+		CommentFileController.writeComment(config, comments);
+		
+		return "Podkomentar";
+	}
+	
 	@GET
 	@Path("/getComments/{themeName}")
 	@Produces(MediaType.APPLICATION_JSON)
