@@ -108,7 +108,6 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	}
 	$scope.subcomment = {};
 	$scope.createNewSubcomment = function(comment){
-		console.log(comment);
 		if(!$scope.subcomment.com){
 			toast('Morate uneti tekst podkomentara');
 		}else{
@@ -116,14 +115,13 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 			$scope.newSubcomment.text = $scope.subcomment.com;
 			for( i = 0; i < $scope.comments.length; i++){
 				if($scope.comments[i].text == comment.text){
+					if($scope.comments[i].children == null)
+						$scope.comments[i].children = [];
 					$scope.comments[i].children.push($scope.newSubcomment);
 					commentFactory.addSubcomment($scope.comments[i]).success(function(data){
-						if(data == "Podkomentar"){
-							toast(data);
-						}
+						toast(data);
 					});
 					$scope.subcomment.com = null;
-					//$scope.openTheme($scope.themeDetail);
 				}
 			}
 		}
@@ -131,27 +129,55 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	$scope.editComment = function(comment){
 		var date = new Date();
 		var newDate = $filter('date')(date, "dd-MM-yyyy HH:mm");
-		$scope.editCommentModal = { "theme" : comment.theme, "author" : comment.author, "creatingDate" : noviDatum, "parent" : comment.parent,
-				"children" : comment.children, "text" : comment.text, "likes" : comment.likes, "dislikes" : comment.dislikes, "changed" : true, "deleted" : false}
+		$scope.editCommentModal = { "theme" : comment.theme, "author" : comment.author, "creatingDate" : newDate, "parent" : comment.parent,
+				"children" : comment.children, "text" : comment.text, "likes" : comment.likes, "dislikes" : comment.dislikes, "changed" : comment.changed, "deleted" : false}
 		$scope.oldCom = comment.text;
 	}
 	$scope.cancelEditComment = function(){
 		$scope.editCommentModal = null;
 	}
 	$scope.saveEditComment = function(){
-		console.log($scope.editCommentModal.text)
-		if($scope.activeUser.username == $scope.editCommentModal.author){
-			//commentFactory.editComment($scope.editCommentModal).success(function(data){
-			//	toast(data);
+		if($scope.activeUser.username == $scope.editCommentModal.theme.subforum.responibleModerator){
+			console.log("odgovorni");
+			commentFactory.editComment($scope.editCommentModal, $scope.oldCom).success(function(data){
+				toast(data);
 				for(i = 0; i < $scope.comments.length; i++){
 					if($scope.comments[i].text == $scope.oldCom){
-						console.log($scope.comments[i].text + " " + $scope.oldCom)
-						$scope.comments[i].text == $scope.editCommentModal.text;
+						$scope.comments[i].text = $scope.editCommentModal.text;
 						$scope.comments[i].creatingDate = $scope.editCommentModal.creatingDate;
 						$scope.comments[i].changed = $scope.editCommentModal.changed;
 					}
+					for(j = 0; j < $scope.comments[i].children.length; j++){
+						if($scope.comments[i].children[j].text == $scope.oldCom){
+							$scope.comments[i].children[j].text = $scope.editCommentModal.text;
+							$scope.comments[i].children[j].creatingDate = $scope.editCommentModal.creatingDate;
+							$scope.comments[i].children[j].changed = $scope.editCommentModal.changed;
+						}
+					}
 				}
-			//});
+			});
+		}else if($scope.activeUser.username == $scope.editCommentModal.author){
+			console.log("autor");
+			$scope.editCommentModal.changed = true;
+			commentFactory.editComment($scope.editCommentModal, $scope.oldCom).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.comments.length; i++){
+					if($scope.comments[i].text == $scope.oldCom){
+						$scope.comments[i].text = $scope.editCommentModal.text;
+						$scope.comments[i].creatingDate = $scope.editCommentModal.creatingDate;
+						$scope.comments[i].changed = $scope.editCommentModal.changed;
+					}
+					for(j = 0; j < $scope.comments[i].children.length; j++){
+						if($scope.comments[i].children[j].text == $scope.oldCom){
+							$scope.comments[i].children[j].text = $scope.editCommentModal.text;
+							$scope.comments[i].children[j].creatingDate = $scope.editCommentModal.creatingDate;
+							$scope.comments[i].children[j].changed = $scope.editCommentModal.changed;
+						}
+					}
+				}
+			});
+		}else{
+			toast('Ne mozete izmeniti komentar');
 		}
 	}
 	$scope.likeTheme = function(theme){
@@ -217,7 +243,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	}
 	$scope.editTheme = function(theme){
 		var date = new Date();
-		var newDate = $filter('date')(date, "dd-MM-yyyy");
+		var newDate = $filter('date')(date, "dd-MM-yyyy HH:mm");
 		$scope.editThemeModal = { "subforum" : theme.subforum, "name" : theme.name, "type" : theme.type, "author" : theme.author, "comments" : theme.comments,
 			"content" : theme.content, "creatingDate" : newDate, "likes" : theme.likes, "dislikes" : theme.dislikes }
 
@@ -236,6 +262,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 						$scope.themes[i].creatingDate = $scope.editThemeModal.creatingDate;
 					}
 				}
+				//angular.element('#editThemeModal').modal('hide');
 			});
 		}else if($scope.activeUser.username == $scope.editThemeModal.subforum.responibleModerator){
 			console.log("odgovorni")

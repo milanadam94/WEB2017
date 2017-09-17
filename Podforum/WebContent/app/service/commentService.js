@@ -12,6 +12,10 @@ app.factory('commentFactory', function($http){
 	factory.getComments = function(themeName){
 		return $http.get('/Podforum/rest/comment/getComments/' + themeName);
 	}
-
+	
+	factory.editComment = function(comment, oldCom){
+		return $http.post('/Podforum/rest/comment/editComment/' + oldCom, comment);
+	}
+	
 	return factory;
 });

@@ -33,7 +33,7 @@ public class CommentController {
 		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
 		
 		Comment newComment = new Comment(comment.getTheme(), comment.getAuthor(), comment.getCreatingDate(), comment.getParent(),
-				comment.getChildren(), comment.getText(), comment.getLikes(), comment.getDislikes(), comment.isChanged(), comment.isDeleted());
+				comment.getText(), comment.getLikes(), comment.getDislikes(), comment.isChanged(), comment.isDeleted());
 		comments.add(newComment);
 		CommentFileController.writeComment(config, comments);
 		
@@ -57,13 +57,25 @@ public class CommentController {
 		
 		for(int i = 0; i < comments.size(); i++){
 			if(comments.get(i).getText().equals(comment.getText())){
-				comments.get(i).getChildren().add(comment.getChildren().get(comment.getChildren().size() - 1));
+				comments.get(i).addChild(comment.getChildren().get(comment.getChildren().size() - 1));
+				//comments.get(i).getChildren().add(comment.getChildren().get(comment.getChildren().size() - 1));
 				break;
 			}
 		}
 		CommentFileController.writeComment(config, comments);
+		for(int i = 0; i < themes.size(); i++){
+			ArrayList<Comment> commentsOfTheme = themes.get(i).getComments();
+			for(int j = 0; j < commentsOfTheme.size(); j++){
+				if(commentsOfTheme.get(j).getText().equals(comment.getText())){
+					//commentsOfTheme.get(j).getChildren().add(comment.getChildren().get(comment.getChildren().size() - 1));
+					commentsOfTheme.get(j).addChild(comment.getChildren().get(comment.getChildren().size() - 1));
+					break;
+				}
+			}
+		}
+		ThemeFileController.writeTheme(config, themes);
 		
-		return "Podkomentar";
+		return "Odgovorili ste na komentar";
 	}
 	
 	@GET
@@ -77,5 +89,65 @@ public class CommentController {
 				commentsOfTheme.add(com);
 		}
 		return commentsOfTheme;
+	}
+	
+	@POST
+	@Path("/editComment/{oldCom}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String editComment(@PathParam(value = "oldCom") String oldCom, Comment comment) throws FileNotFoundException, IOException{
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
+		
+		boolean isSubcomment = true;
+		for(int i = 0; i < comments.size(); i++){
+			if(comments.get(i).getText().equals(oldCom)){
+				comments.get(i).setText(comment.getText());
+				comments.get(i).setChanged(comment.isChanged());
+				comments.get(i).setCreatingDate(comment.getCreatingDate());
+				isSubcomment = false;
+				break;
+			}
+		}
+		if(isSubcomment){
+			for(int i = 0; i < comments.size(); i++){
+				ArrayList<Comment> children = comments.get(i).getChildren();
+				for(int j = 0; j < children.size(); j++){
+					if(children.get(j).getText().equals(oldCom)){
+						children.get(j).setText(comment.getText());
+						children.get(j).setChanged(comment.isChanged());
+						children.get(j).setCreatingDate(comment.getCreatingDate());
+						break;
+					}
+				}
+			}
+		}
+		CommentFileController.writeComment(config, comments);
+		
+		for(int i = 0 ; i < themes.size(); i++){
+			ArrayList<Comment> commentsOfTheme = themes.get(i).getComments();
+			boolean isSubCom = true;
+			for(int j = 0; j < commentsOfTheme.size(); j++){
+				if(commentsOfTheme.get(j).getText().equals(oldCom)){
+					commentsOfTheme.get(j).setText(comment.getText());
+					commentsOfTheme.get(j).setChanged(comment.isChanged());
+					commentsOfTheme.get(j).setCreatingDate(comment.getCreatingDate());
+					isSubCom = false;
+					break;
+				}
+			}
+			if(isSubCom){
+				ArrayList<Comment> children = commentsOfTheme.get(i).getChildren();
+				for(int j = 0; j < children.size(); j++){
+					if(children.get(j).getText().equals(oldCom)){
+						children.get(j).setText(comment.getText());
+						children.get(j).setChanged(comment.isChanged());
+						children.get(j).setCreatingDate(comment.getCreatingDate());
+						break;
+					}
+				}
+			}
+		}
+		ThemeFileController.writeTheme(config, themes);
+		return "Komentar izmenjen";
 	}
 }

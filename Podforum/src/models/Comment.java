@@ -21,14 +21,14 @@ public class Comment {
 		super();
 	}
 	
-	public Comment(Theme theme, String author, String creatingDate, Comment parent, ArrayList<Comment> children,
+	public Comment(Theme theme, String author, String creatingDate, Comment parent,
 			String text, int likes, int dislikes, boolean changed, boolean deleted) {
 		super();
 		this.theme = theme;
 		this.author = author;
 		this.creatingDate = creatingDate;
 		this.parent = parent;
-		this.children = children;
+		this.children = new ArrayList<Comment>();
 		this.text = text;
 		this.likes = likes;
 		this.dislikes = dislikes;
@@ -76,6 +76,19 @@ public class Comment {
 		this.children = children;
 	}
 
+	public void addChild(Comment comment){
+		if(children == null){
+			children = new ArrayList<Comment>();
+			children.add(comment);
+		}else{
+			children.add(comment);
+		}
+	}
+	
+	public void removeChild(Comment comment){
+		children.remove(comment);
+	}
+	
 	public String getText() {
 		return text;
 	}
