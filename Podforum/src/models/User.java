@@ -123,5 +123,16 @@ public class User {
 		this.comments = comments;
 	}
 	
+	public void saveComment(Comment comment){
+		if(comments == null){
+			comments = new ArrayList<Comment>();
+			comments.add(comment);
+		}else{
+			comments.add(comment);
+		}
+	}
 	
+	public void removeSavedComment(Comment comment){
+		comments.remove(comment);
+	}
 }

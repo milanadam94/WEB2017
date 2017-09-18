@@ -26,11 +26,11 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	var datum = new Date();
 	var noviDatum = $filter('date')(datum, "dd-MM-yyyy HH:mm");
 	$scope.newTheme = { "subforum" : $scope.subforumDetail, "name" : null, "type" : null, "author" : $scope.activeUser.username, 
-			"comments" : null, "content" : null, "creatingDate" : noviDatum, "likes" : 0, "dislikes" : 0 }
+			"comments" : [], "content" : null, "creatingDate" : noviDatum, "likes" : 0, "dislikes" : 0 , "usersLiked" : [], "usersDisliked" : []}
 	$scope.newComment = { "theme" : $scope.themeDetail, "author" : $scope.activeUser.username, "creatingDate" : noviDatum, "parent" : null,
-			"children" : [], "text" : null, "likes" : 0, "dislikes" : 0, "changed" : false, "deleted" : false}
+			"children" : [], "text" : null, "likes" : 0, "dislikes" : 0, "changed" : false, "deleted" : false, "usersLiked" : [], "usersDisliked" : []}
 	$scope.newSubcomment = { "theme" : $scope.themeDetail, "author" : $scope.activeUser.username, "creatingDate" : noviDatum, "parent" : null,
-			"children" : [], "text" : null, "likes" : 0, "dislikes" : 0, "changed" : false, "deleted" : false}
+			"children" : [], "text" : null, "likes" : 0, "dislikes" : 0, "changed" : false, "deleted" : false, "usersLiked" : [], "usersDisliked" : []}
 	
 	$scope.viewInbox = false;
 	$scope.newMessage = false;
@@ -89,6 +89,9 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		commentFactory.getComments(theme.name).success(function(data){
 			$scope.comments = data;
 		});
+		commentFactory.getSavedComments($scope.activeUser.username).success(function(data){
+			$scope.savedComments = data;
+		});
 	}
 	$scope.createNewComment = function(){
 		if(!$scope.newCommentText){
@@ -100,7 +103,16 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 				if(data == "Prokomentarisana tema"){
 					toast(data);
 					$scope.comments.push($scope.newComment);
+					/*for(i = 0; i < $scope.themes.length; i++){
+						if(angular.equals($scope.themes[i], $scope.newComment.theme)){
+							$scope.themes[i].comments = $scope.themes[i].comments.concat($scope.newComment);
+							//Array.prototype.push.apply($scope.themes[i].comments, $scope.newComment);
+						}
+					}*/
 					$scope.newCommentText = null;
+					$scope.newComment.children = [];
+					$scope.newComment.theme = null;
+					//$scope.newComment.text = null;
 				}
 			});
 			$scope.openTheme($scope.themeDetail);
@@ -108,6 +120,10 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 	}
 	$scope.subcomment = {};
 	$scope.createNewSubcomment = function(comment){
+		if(comment.deleted){
+			toast('Ne mozete odgovoriti na obrisan komentar');
+			return;
+		}
 		if(!$scope.subcomment.com){
 			toast('Morate uneti tekst podkomentara');
 		}else{
@@ -130,13 +146,17 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		var date = new Date();
 		var newDate = $filter('date')(date, "dd-MM-yyyy HH:mm");
 		$scope.editCommentModal = { "theme" : comment.theme, "author" : comment.author, "creatingDate" : newDate, "parent" : comment.parent,
-				"children" : comment.children, "text" : comment.text, "likes" : comment.likes, "dislikes" : comment.dislikes, "changed" : comment.changed, "deleted" : false}
+				"children" : comment.children, "text" : comment.text, "likes" : comment.likes, "dislikes" : comment.dislikes, "changed" : comment.changed, "deleted" : comment.deleted}
 		$scope.oldCom = comment.text;
 	}
 	$scope.cancelEditComment = function(){
 		$scope.editCommentModal = null;
 	}
 	$scope.saveEditComment = function(){
+		if($scope.editCommentModal.deleted){
+			toast('Ne mozete izmeniti obrisan komentar');
+			return;
+		}
 		if($scope.activeUser.username == $scope.editCommentModal.theme.subforum.responibleModerator){
 			console.log("odgovorni");
 			commentFactory.editComment($scope.editCommentModal, $scope.oldCom).success(function(data){
@@ -180,12 +200,144 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 			toast('Ne mozete izmeniti komentar');
 		}
 	}
+	$scope.deleteComment = function(comment){
+		if(comment.deleted){
+			toast('Komentar je vec obrisan');
+			return;
+		}
+		if($scope.isAdministrator()){
+			console.log("admin");
+			commentFactory.deleteComment(comment).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.comments.length; i++){
+					if($scope.comments[i].text == comment.text){
+						$scope.comments[i].deleted = true;
+						for(j = 0; j < $scope.comments[i].children.length; j++)
+							$scope.comments[i].children[j].deleted = true;
+					}else{
+						for(j = 0; j < $scope.comments[i].children.length; j++){
+							if($scope.comments[i].children[j].text == comment.text)
+								$scope.comments[i].children[j].deleted = true;
+						}
+					}
+				}
+			});
+		}else if($scope.activeUser.username == comment.theme.subforum.responibleModerator){
+			console.log("odgovorniModerator");
+			commentFactory.deleteComment(comment).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.comments.length; i++){
+					if($scope.comments[i].text == comment.text){
+						$scope.comments[i].deleted = true;
+						for(j = 0; j < $scope.comments[i].children.length; j++)
+							$scope.comments[i].children[j].deleted = true;
+					}else{
+						for(j = 0; j < $scope.comments[i].children.length; j++){
+							if($scope.comments[i].children[j].text == comment.text)
+								$scope.comments[i].children[j].deleted = true;
+						}
+					}
+				}
+			});
+		}else if($scope.activeUser.username == comment.author){
+			console.log("autor");
+			commentFactory.deleteComment(comment).success(function(data){
+				toast(data);
+				for(i = 0; i < $scope.comments.length; i++){
+					if($scope.comments[i].text == comment.text){
+						$scope.comments[i].deleted = true;
+						for(j = 0; j < $scope.comments[i].children.length; j++)
+							$scope.comments[i].children[j].deleted = true;
+					}else{
+						for(j = 0; j < $scope.comments[i].children.length; j++){
+							if($scope.comments[i].children[j].text == comment.text)
+								$scope.comments[i].children[j].deleted = true;
+						}
+					}
+				}
+			});
+		}else{
+			
+		}
+	}
+	$scope.saveComment = function(comment){
+		$scope.isSaved = false;
+		for(i = 0; i < $scope.savedComments.length; i++){
+			if($scope.savedComments[i].text == comment.text)
+				$scope.isSaved = true;
+		}
+		if(!$scope.isSaved){
+			$scope.savedComments.push(comment);
+			for(i = 0; i < $scope.comments.length; i++){
+				if($scope.comments[i].text == comment.text){
+					commentFactory.saveComment($scope.activeUser.username, $scope.comments[i]).success(function(data){
+						toast(data);
+					});
+				}else{
+					for(j = 0; j < $scope.comments[i].children.length; j++){
+						if($scope.comments[i].children[j].text == comment.text){
+							commentFactory.saveComment($scope.activeUser.username, $scope.comments[i].children[j]).success(function(data){
+								toast(data);
+							});
+						}
+					}
+				}
+			}
+		}else{
+			toast('Vec ste snimili ovaj komentar');
+		}
+	}
+	$scope.likeComment = function(comment){
+		commentFactory.likeComment($scope.activeUser.username, comment).success(function(data){
+			if(data == "Komentar je lajkovan"){
+				for(i = 0; i < $scope.comments.length; i++){
+					if($scope.comments[i].text == comment.text){
+						$scope.comments[i].likes++;
+						$scope.comments[i].usersLiked.push($scope.activeUser.username);
+					}else{
+						for(j = 0; j < $scope.comments[i].children.length; j++){
+							if($scope.comments[i].children[j].text == comment.text){
+								$scope.comments[i].children[j].likes++;
+								$scope.comments[i].children[j].usersLiked.push($scope.activeUser.username);
+							}
+						}
+					}
+				}
+				toast(data);
+			}else{
+				toast(data);
+			}
+		});
+	}
+	$scope.dislikeComment = function(comment){
+		commentFactory.dislikeComment($scope.activeUser.username, comment).success(function(data){
+			if(data == "Komentar je dislajkovan"){
+				for(i = 0; i < $scope.comments.length; i++){
+					if($scope.comments[i].text == comment.text){
+						$scope.comments[i].dislikes++;
+						$scope.comments[i].usersDisliked.push($scope.activeUser.username);
+					}else{
+						for(j = 0; j < $scope.comments[i].children.length; j++){
+							if($scope.comments[i].children[j].text == comment.text){
+								$scope.comments[i].children[j].dislikes++;
+								$scope.comments[i].children[j].usersDisliked.push($scope.activeUser.username);
+							}
+						}
+					}
+				}
+				toast(data);
+			}else{
+				toast(data);
+			}
+		});
+	}
 	$scope.likeTheme = function(theme){
 		themeFactory.likeTheme($scope.activeUser.username, theme).success(function(data){
 			if(data == "Tema lajkovana"){
 				for(i = 0; i < $scope.themes.length; i++){
 					if($scope.themes[i].name == theme.name){
 						$scope.themes[i].likes++;
+						$scope.themes[i].usersLiked.push($scope.activeUser.username);
 					}
 				}
 				toast(data);
@@ -200,6 +352,7 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 				for(i = 0; i < $scope.themes.length; i++){
 					if($scope.themes[i].name == theme.name){
 						$scope.themes[i].dislikes++;
+						$scope.themes[i].usersDisliked.push($scope.activeUser.username);
 					}
 				}
 				toast(data);
@@ -216,7 +369,10 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		}else if(!$scope.newTheme.content){
 			toast('Morate uneti sadrzaj teme');
 		}else{
+			var datum = new Date();
+			var noviDatum = $filter('date')(datum, "dd-MM-yyyy HH:mm");
 			$scope.newTheme.subforum = $scope.subforumDetail;
+			$scope.newTheme.creatingDate = noviDatum;
 			themeFactory.addTheme($scope.newTheme).success(function(data){
 				if(data == "Uspesno kreirana tema"){
 					toast(data);
@@ -234,9 +390,13 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		}
 		if(!$scope.isSaved){
 			$scope.savedThemes.push(theme);
-			themeFactory.saveTheme($scope.activeUser.username, theme).success(function(data){
-				toast(data);
-			});
+			for(i = 0; i < $scope.themes.length; i++){
+				if($scope.themes[i].name == theme.name){
+					themeFactory.saveTheme($scope.activeUser.username, $scope.themes[i]).success(function(data){
+						toast(data);
+					});
+				}
+			}
 		}else{
 			toast('Vec ste snimili ovu temu');
 		}
@@ -323,15 +483,6 @@ app.controller('userController', ['$scope', '$window', '$location', '$cookies', 
 		}else{
 			toast('Ne mozete obrisati temu');
 		}
-		
-		/*$scope.clearSc = function() {
-			if (confirm('Da li ste sigurni?') == true) {
-		    	shoppingCartFactory.clearSc().success(function(data) {
-		    		$scope.sc = {};
-		    		$scope.total = 0.0;
-		    	});
-			}
-	    };*/
 	}
 	$scope.cancelNewTheme = function(){
 		themeFactory.getThemes($scope.subforumDetail.name).success(function(data){

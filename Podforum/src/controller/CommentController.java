@@ -16,8 +16,10 @@ import javax.ws.rs.core.MediaType;
 
 import fileControllers.CommentFileController;
 import fileControllers.ThemeFileController;
+import fileControllers.UserFileController;
 import models.Comment;
 import models.Theme;
+import models.User;
 
 @Path("/comment")
 public class CommentController {
@@ -33,7 +35,7 @@ public class CommentController {
 		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
 		
 		Comment newComment = new Comment(comment.getTheme(), comment.getAuthor(), comment.getCreatingDate(), comment.getParent(),
-				comment.getText(), comment.getLikes(), comment.getDislikes(), comment.isChanged(), comment.isDeleted());
+				comment.getText(), 0, 0, false, false);
 		comments.add(newComment);
 		CommentFileController.writeComment(config, comments);
 		
@@ -91,6 +93,18 @@ public class CommentController {
 		return commentsOfTheme;
 	}
 	
+	@GET
+	@Path("/getSavedComments/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Comment> getSavedComments(@PathParam(value = "username") String username) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		for (User user : users) {
+			if(user.getUsername().equals(username)){
+				return user.getComments();
+			}
+		}
+		return null;
+	}
 	@POST
 	@Path("/editComment/{oldCom}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -149,5 +163,157 @@ public class CommentController {
 		}
 		ThemeFileController.writeTheme(config, themes);
 		return "Komentar izmenjen";
+	}
+	
+	@POST
+	@Path("/deleteComment")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String deleteComment(Comment comment) throws FileNotFoundException, IOException{
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
+		
+		for(int i = 0; i < comments.size(); i++){
+			if(comments.get(i).getText().equals(comment.getText())){	//ako "brisem" komentar,onda i podkomentare "brisem"
+				comments.get(i).setDeleted(true);
+				for(int m = 0; m < comments.get(i).getChildren().size(); m++){
+					comments.get(i).getChildren().get(m).setDeleted(true);
+				}
+				break;
+			}
+			ArrayList<Comment> children = comments.get(i).getChildren();
+			for(int j = 0; j < children.size(); j++){
+				if(children.get(j).getText().equals(comment.getText())){
+					children.get(j).setDeleted(true);
+					break;
+				}
+			}
+		}
+		CommentFileController.writeComment(config, comments);
+		
+		for(int i = 0; i < themes.size(); i++){
+			ArrayList<Comment> commentsOfTheme = themes.get(i).getComments();
+			for(int j = 0; j < commentsOfTheme.size(); j++){
+				if(commentsOfTheme.get(j).getText().equals(comment.getText())){	//"brisem" i podkomentare
+					for(int m = 0; m < commentsOfTheme.get(j).getChildren().size(); m++){
+						commentsOfTheme.get(j).getChildren().get(m).setDeleted(true);
+					}
+					commentsOfTheme.get(j).setDeleted(true);
+					break;
+				}
+				ArrayList<Comment> children = commentsOfTheme.get(j).getChildren();
+				for(int k = 0; k < children.size(); k++){
+					if(children.get(k).getText().equals(comment.getText())){
+						children.get(k).setDeleted(true);
+						break;
+					}
+				}
+			}
+		}
+		ThemeFileController.writeTheme(config, themes);
+		
+		return "Komentar obrisan";
+	}
+	
+	@POST
+	@Path("/saveComment/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String saveComment(@PathParam(value = "username") String username, Comment comment) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		for (User user : users) {
+			if(user.getUsername().equals(username)){
+				user.saveComment(comment);
+				break;
+			}
+		}
+		UserFileController.writeUser(config, users);
+		return "Snimili ste komentar";
+	}
+	
+	@POST
+	@Path("/likeComment/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String likeComment(@PathParam(value = "username") String username, Comment comment) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		
+		for(int i = 0; i < comments.size(); i++){
+			if(comments.get(i).getText().equals(comment.getText())){
+				for(String user : comments.get(i).getUsersLiked()){
+					if(user.equals(username))
+						return "Vec ste lajkovali komentar";
+				}
+				for(String user : comments.get(i).getUsersDisliked()){
+					if(user.equals(username))
+						return "Vec ste dislajkovali komentar";
+				}
+				comments.get(i).setLikes(comments.get(i).getLikes() + 1);
+				comments.get(i).addUserLiked(username);
+				break;
+			}else{
+				ArrayList<Comment> children = comments.get(i).getChildren();
+				for(int j = 0; j < children.size(); j++){
+					if(children.get(j).getText().equals(comment.getText())){
+						for(String user : children.get(j).getUsersLiked()){
+							if(user.equals(username))
+								return "Vec ste lajkovali podkomentar";
+						}
+						for(String user : children.get(j).getUsersDisliked()){
+							if(user.equals(username))
+								return "Vec ste dislajkovali podkomentar";
+						}
+						children.get(j).setLikes(children.get(j).getLikes() + 1);
+						children.get(j).addUserLiked(username);
+						break;
+					}
+				}
+			}
+		}
+		CommentFileController.writeComment(config, comments);
+	
+		return "Komentar je lajkovan";
+	}
+	
+	@POST
+	@Path("/dislikeComment/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String dislikeComment(@PathParam(value = "username") String username, Comment comment) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		
+		for(int i = 0; i < comments.size(); i++){
+			if(comments.get(i).getText().equals(comment.getText())){
+				for(String user : comments.get(i).getUsersLiked()){
+					if(user.equals(username))
+						return "Vec ste lajkovali komentar";
+				}
+				for(String user : comments.get(i).getUsersDisliked()){
+					if(user.equals(username))
+						return "Vec ste dislajkovali komentar";
+				}
+				comments.get(i).setDislikes(comments.get(i).getDislikes() + 1);
+				comments.get(i).addUserDisliked(username);
+				break;
+			}else{
+				ArrayList<Comment> children = comments.get(i).getChildren();
+				for(int j = 0; j < children.size(); j++){
+					if(children.get(j).getText().equals(comment.getText())){
+						for(String user : children.get(j).getUsersLiked()){
+							if(user.equals(username))
+								return "Vec ste lajkovali podkomentar";
+						}
+						for(String user : children.get(j).getUsersDisliked()){
+							if(user.equals(username))
+								return "Vec ste dislajkovali podkomentar";
+						}
+						children.get(j).setDislikes(children.get(j).getDislikes() + 1);
+						children.get(j).addUserDisliked(username);
+						break;
+					}
+				}
+			}
+		}
+		CommentFileController.writeComment(config, comments);
+	
+		return "Komentar je dislajkovan";
 	}
 }

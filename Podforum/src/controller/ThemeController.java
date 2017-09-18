@@ -180,21 +180,11 @@ public class ThemeController {
 			if(themes.get(i).getName().equals(theme.getName())){
 				for(String user : themes.get(i).getUsersDisliked()){
 					if(user.equals(username))
-						return "Vec ste dislajkovali";
+						return "Vec ste dislajkovali temu";
 				}
 				for(String user : themes.get(i).getUsersLiked()){
 					if(user.equals(username))
-						return "Vec ste lajkovali";
-				}
-				for(User user : users){
-					ArrayList<Theme> userThemes = user.getThemes();
-					for(int j = 0; j < userThemes.size(); j++){
-						if(userThemes.get(j).getName().equals(theme.getName())){
-							userThemes.get(j).setLikes(userThemes.get(j).getLikes() + 1);
-							userThemes.get(j).addUserLiked(username);
-							break;
-						}
-					}
+						return "Vec ste lajkovali temu";
 				}
 				themes.get(i).setLikes(themes.get(i).getLikes() + 1);
 				themes.get(i).addUserLiked(username);
@@ -202,6 +192,16 @@ public class ThemeController {
 			}
 		}
 		ThemeFileController.writeTheme(config, themes);
+		for(User user : users){
+			ArrayList<Theme> userThemes = user.getThemes();
+			for(int j = 0; j < userThemes.size(); j++){
+				if(userThemes.get(j).getName().equals(theme.getName())){
+					userThemes.get(j).setLikes(userThemes.get(j).getLikes() + 1);
+					userThemes.get(j).addUserLiked(username);
+					break;
+				}
+			}
+		}
 		UserFileController.writeUser(config, users);
 		return "Tema lajkovana";
 	}
@@ -217,21 +217,11 @@ public class ThemeController {
 			if(themes.get(i).getName().equals(theme.getName())){
 				for(String user : themes.get(i).getUsersDisliked()){
 					if(user.equals(username))
-						return "Vec ste dislajkovali";
+						return "Vec ste dislajkovali temu";
 				}
 				for(String user : themes.get(i).getUsersLiked()){
 					if(user.equals(username))
-						return "Vec ste lajkovali";
-				}
-				for(User user : users){
-					ArrayList<Theme> userThemes = user.getThemes();
-					for(int j = 0; j < userThemes.size(); j++){
-						if(userThemes.get(j).getName().equals(theme.getName())){
-							userThemes.get(j).setDislikes(userThemes.get(j).getDislikes() + 1);
-							userThemes.get(j).addUserDisliked(username);
-							break;
-						}
-					}
+						return "Vec ste lajkovali temu";
 				}
 				themes.get(i).setDislikes(themes.get(i).getDislikes() + 1);
 				themes.get(i).addUserDisliked(username);
@@ -239,6 +229,16 @@ public class ThemeController {
 			}
 		}
 		ThemeFileController.writeTheme(config, themes);
+		for(User user : users){
+			ArrayList<Theme> userThemes = user.getThemes();
+			for(int j = 0; j < userThemes.size(); j++){
+				if(userThemes.get(j).getName().equals(theme.getName())){
+					userThemes.get(j).setDislikes(userThemes.get(j).getDislikes() + 1);
+					userThemes.get(j).addUserDisliked(username);
+					break;
+				}
+			}
+		}
 		UserFileController.writeUser(config, users);
 		return "Tema dislajkovana";
 	}

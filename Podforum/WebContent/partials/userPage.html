@@ -160,8 +160,9 @@
         <div ng-repeat="comment in comments">
         	<div class="form-row">
         		<hr style="border-style: inset;border-width: 1px;">
+        		<label>#1</label>
 				<div class="form-group col-sm-12">
-					<div class="form-group col-sm-2">
+					<div class="form-group col-sm-2" ng-if="comment.deleted == false">
 						<label>Autor: </label>
 						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.author}} </label>  
 					</div>
@@ -169,17 +170,17 @@
 						<label>Datum: </label>
 						<label class="control-label" style="color: #B4886B; font-size: 22px"> {{comment.creatingDate}} </label> 
 					</div>
-					<div class="form-group col-sm-3">
+					<div class="form-group col-sm-3" ng-if="comment.deleted == false">
 						<label>Tekst: </label>
 						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.text}} </label> 
 					</div>
 					<div class="form-group col-sm-2">
 						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.likes}} </label> 
-						<button type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-thumbs-up" style="font-size:large;">&nbsp;Like</span></button>
+						<button type="button" class="btn btn-primary btn-sm" ng-click="likeComment(comment)"><span class="glyphicon glyphicon-thumbs-up" style="font-size:large;">&nbsp;Like</span></button>
 					</div>
 					<div class="form-group col-sm-2">
 						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.dislikes}} </label> 
-						<button type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-thumbs-down" style="font-size:large;">&nbsp;Dislike</span></button>
+						<button type="button" class="btn btn-default btn-sm" ng-click="dislikeComment(comment)"><span class="glyphicon glyphicon-thumbs-down" style="font-size:large;">&nbsp;Dislike</span></button>
 					</div>
 					<div class="form-group col-sm-1">
 						<a href="" ng-if="comment.changed == false"><span style="font-size: 40px;" class="glyphicon glyphicon-star-empty"></span></a>
