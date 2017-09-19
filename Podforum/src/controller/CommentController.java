@@ -105,6 +105,7 @@ public class CommentController {
 		}
 		return null;
 	}
+	
 	@POST
 	@Path("/editComment/{oldCom}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -230,6 +231,25 @@ public class CommentController {
 	}
 	
 	@POST
+	@Path("/removeSavedComment/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String removeSavedComment(@PathParam(value = "username") String username, Comment comment) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		for(int i = 0; i < users.size(); i++){
+			if(users.get(i).getUsername().equals(username)){
+				for(int j = 0; j < users.get(i).getComments().size(); j++){
+					if(users.get(i).getComments().get(j).getText().equals(comment.getText())){
+						users.get(i).getComments().remove(j);
+						break;
+					}
+				}
+			}
+		}
+		UserFileController.writeUser(config, users);
+		return "Obrisan komentar";
+	}
+	
+	@POST
 	@Path("/likeComment/{username}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public String likeComment(@PathParam(value = "username") String username, Comment comment) throws FileNotFoundException, IOException{
@@ -314,6 +334,112 @@ public class CommentController {
 		}
 		CommentFileController.writeComment(config, comments);
 	
+		return "Komentar je dislajkovan";
+	}
+	
+	@GET
+	@Path("/getLikedComments/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Comment> getLikedComments(@PathParam(value = "username") String username) throws FileNotFoundException, IOException{
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		ArrayList<Comment> likedComments = new ArrayList<Comment>();
+		
+		for(int i = 0; i < comments.size(); i++){
+			for(int j = 0; j < comments.get(i).getUsersLiked().size(); j++){
+				if(comments.get(i).getUsersLiked().get(j).equals(username)){
+					likedComments.add(comments.get(i));
+				}
+			}
+			for(int m = 0; m < comments.get(i).getChildren().size(); m++){
+				for(int n = 0; n < comments.get(i).getChildren().get(m).getUsersLiked().size(); n++){
+					if(comments.get(i).getChildren().get(m).getUsersLiked().get(n).equals(username)){
+						likedComments.add(comments.get(i).getChildren().get(m));
+					}
+				}
+			}
+		}
+		return likedComments;
+	}
+	
+	@GET
+	@Path("/getDislikedComments/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Comment> getDislikedComments(@PathParam(value = "username") String username) throws FileNotFoundException, IOException{
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		ArrayList<Comment> dislikedComments = new ArrayList<Comment>();
+		
+		for(int i = 0; i < comments.size(); i++){
+			for(int j = 0; j < comments.get(i).getUsersDisliked().size(); j++){
+				if(comments.get(i).getUsersDisliked().get(j).equals(username)){
+					dislikedComments.add(comments.get(i));
+				}
+			}
+			for(int m = 0; m < comments.get(i).getChildren().size(); m++){
+				for(int n = 0; n < comments.get(i).getChildren().get(m).getUsersDisliked().size(); n++){
+					if(comments.get(i).getChildren().get(m).getUsersDisliked().get(n).equals(username)){
+						dislikedComments.add(comments.get(i).getChildren().get(m));
+					}
+				}
+			}
+		}
+		return dislikedComments;
+	}
+	
+	@POST
+	@Path("/dislikeLikedComment/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String dislikeLikedComment(@PathParam(value = "username") String username, Comment comment) throws FileNotFoundException, IOException{
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		for(int i = 0; i < comments.size(); i++){
+			if(comments.get(i).getText().equals(comment.getText())){
+				for(int j = 0; j < comments.get(i).getUsersLiked().size(); j++){
+					if(comments.get(i).getUsersLiked().get(j).equals(username)){
+						comments.get(i).removeUserLiked(username);
+						comments.get(i).setLikes(comments.get(i).getLikes() - 1);
+						break;
+					}
+				}
+			}else{
+				ArrayList<Comment> children = comments.get(i).getChildren();
+				for(int m = 0; m < children.size(); m++){
+					if(children.get(m).getText().equals(comment.getText())){
+						children.get(m).removeUserLiked(username);
+						children.get(m).setLikes(children.get(m).getLikes() - 1);
+						break;
+					}
+				}
+			}
+		}
+		CommentFileController.writeComment(config, comments);
+		return "Komentar je lajkovan";
+	}
+	
+	@POST
+	@Path("/likeDislikedComment/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String likeDislikedComment(@PathParam(value = "username") String username, Comment comment) throws FileNotFoundException, IOException{
+		ArrayList<Comment> comments = CommentFileController.readComment(config);
+		for(int i = 0; i < comments.size(); i++){
+			if(comments.get(i).getText().equals(comment.getText())){
+				for(int j = 0; j < comments.get(i).getUsersDisliked().size(); j++){
+					if(comments.get(i).getUsersDisliked().get(j).equals(username)){
+						comments.get(i).removeUserDisliked(username);
+						comments.get(i).setDislikes(comments.get(i).getDislikes() - 1);
+						break;
+					}
+				}
+			}else{
+				ArrayList<Comment> children = comments.get(i).getChildren();
+				for(int m = 0; m < children.size(); m++){
+					if(children.get(m).getText().equals(comment.getText())){
+						children.get(m).removeUserDisliked(username);
+						children.get(m).setDislikes(children.get(m).getDislikes() - 1);
+						break;
+					}
+				}
+			}
+		}
+		CommentFileController.writeComment(config, comments);
 		return "Komentar je dislajkovan";
 	}
 }

@@ -22,8 +22,10 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import fileControllers.SubforumFileController;
+import fileControllers.ThemeFileController;
 import fileControllers.UserFileController;
 import models.Subforum;
+import models.Theme;
 import models.User;
 
 @Path("/subforum")
@@ -89,6 +91,8 @@ public class SubforumController {
 	public String deleteSubforum(Subforum subforum) throws FileNotFoundException, IOException{
 		ArrayList<User> users = UserFileController.readUser(config);
 		ArrayList<Subforum> subforums = SubforumFileController.readSubforum(config);
+		ArrayList<Theme> themes = ThemeFileController.readTheme(config);
+		
 		for(int i = 0; i < users.size(); i++){
 			ArrayList<Subforum> followSub = users.get(i).getSubforums();
 			for(int j = 0; j < followSub.size(); j++){
@@ -106,6 +110,13 @@ public class SubforumController {
 			}
 		}
 		SubforumFileController.writeSubforum(config, subforums);
+		
+		for(int i = 0; i < themes.size(); i++){
+			if(themes.get(i).getSubforum().getName().equals(subforum.getName())){
+				themes.remove(i);
+			}
+		}
+		ThemeFileController.writeTheme(config, themes);
 		return "Uspesno obrisan podforum.";
 	}
 	
@@ -122,6 +133,26 @@ public class SubforumController {
 		}
 		UserFileController.writeUser(config, users);
 		return "Zapratili ste podforum.";
+	}
+	
+	@POST
+	@Path("/unfollowSubforum/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String unfollowSubforum(@PathParam(value = "username") String username, Subforum subforum) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		for(User user : users){
+			if(user.getUsername().equals(username)){
+				for(int i = 0; i < user.getSubforums().size(); i++){
+					if(user.getSubforums().get(i).getName().equals(subforum.getName())){
+						user.getSubforums().remove(i);
+						break;
+					}
+				}
+				break;
+			}
+		}
+		UserFileController.writeUser(config, users);
+		return "Otpratili ste podforum.";
 	}
 	
 	@GET
@@ -142,5 +173,44 @@ public class SubforumController {
 			pathDatabase.mkdir();
 		}
 		return pathDatabase;
+	}
+	
+	@GET
+	@Path("/search/{name}/{description}/{responsibleModerator}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Subforum> search(@PathParam(value = "name") String name, @PathParam(value = "description") String description,
+			@PathParam(value = "responsibleModerator") String responsibleModerator) throws FileNotFoundException, IOException{
+		ArrayList<Subforum> subforums = SubforumFileController.readSubforum(config);
+		ArrayList<Subforum> retSubforums = new ArrayList<Subforum>();
+		
+		for(int i = 0; i < subforums.size(); i++){
+			if((subforums.get(i).getName().startsWith(name)) && (subforums.get(i).getDescription().startsWith(description)) && (subforums.get(i).getResponibleModerator().startsWith(responsibleModerator))){
+				retSubforums.add(subforums.get(i));
+				//System.out.println("111");
+			}else if((subforums.get(i).getName().startsWith(name)) && (subforums.get(i).getDescription().startsWith(description)) && (responsibleModerator != null && !responsibleModerator.equals(""))) {
+				retSubforums.add(subforums.get(i));
+				//System.out.println("110");
+			}else if((subforums.get(i).getName().startsWith(name)) && (description != null && !description.equals("")) && (subforums.get(i).getResponibleModerator().startsWith(responsibleModerator))) {
+				retSubforums.add(subforums.get(i));
+				//System.out.println("101");
+			}else if((name != null && !name.equals("")) && (subforums.get(i).getDescription().startsWith(description)) && (subforums.get(i).getResponibleModerator().startsWith(responsibleModerator))) {
+				retSubforums.add(subforums.get(i));
+				//System.out.println("011");
+			}else if((name != null && !name.equals("")) && (description != null && !description.equals("")) && (subforums.get(i).getResponibleModerator().startsWith(responsibleModerator))) {
+				retSubforums.add(subforums.get(i));
+				//System.out.println("001");
+			}else if((name != null && !name.equals("")) && (subforums.get(i).getDescription().startsWith(description)) && (responsibleModerator != null && !responsibleModerator.equals(""))) {
+				retSubforums.add(subforums.get(i));
+				//System.out.println("010");
+			}else if((subforums.get(i).getName().startsWith(name)) && (description != null && !description.equals("")) && (responsibleModerator != null && !responsibleModerator.equals(""))) {
+				retSubforums.add(subforums.get(i));
+				//System.out.println("100");
+			}else{
+				//System.out.println("000");
+				//return subforums;
+			}
+		}
+		
+		return retSubforums;
 	}
 }

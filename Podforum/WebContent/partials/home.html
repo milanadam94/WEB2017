@@ -22,7 +22,7 @@
 						<table class="table table-striped">
 				    		<thead>
 				      			<tr>
-				        			<th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Detalji</th>
+				        			<th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Odgovorni moderator</th><th>Detalji</th>
 				      			</tr>
 				     		</thead>
 				     		<tbody>
@@ -30,7 +30,8 @@
 						     		<td> {{ subforum.name }} </td>
 						     		<td> {{ subforum.description }} </td>
 						     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
-						     		<td> <button type="submit" class="btn btn-success buttons" ng-click="details(subforum)"><span style="font-size:large;">Detalji</span></button> </td>
+						     		<td> {{ subforum.responibleModerator }} </td>
+						     		<td> <button type="submit" class="btn btn-success buttons" ng-click="details(subforum)"><span style="font-size:large;" class="glyphicon glyphicon-info-sign">&nbsp;Detalji</span></button> </td>
 						     	</tr>
 				     		</tbody>
 						</table>
@@ -57,7 +58,7 @@
 					</div>
 						<table class="table table-striped">
 				    		<thead>
-                            	<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th></tr>
+                            	<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>&nbsp;</th><th>&nbsp;</th></tr>
                             </thead>
                                     <tbody>
                                     	<tr ng-repeat="theme in themes">
@@ -67,6 +68,12 @@
                                     		<td ng-if="theme.type == 'IMAGE'"> <img alt="ikonica" src="{{theme.content}}" height="50px" width="50px"> </td>
                                     		<td> {{ theme.author }} </td>
                                     		<td> {{ theme.creatingDate }} </td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.likes}}&nbsp;<span style="font-size:large;" class="glyphicon glyphicon-thumbs-up"></span></label>
+                                    		</td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.dislikes}}&nbsp;<span style="font-size:large;" class="glyphicon glyphicon-thumbs-down"></span></label>
+                                    		</td>
                                     	</tr>
                                     </tbody>
                          </table>
@@ -74,5 +81,47 @@
           	</div>
        	</div>
 	</div>
-	
+	<div ng-show="themeDetails">
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h3> {{ themeDetail.name }} </h3>&nbsp;&nbsp;&nbsp;
+				<h3 ng-if="themeDetail.type == 'TEXT'"> {{ themeDetail.content }} </h3>
+				<img src="{{themeDetail.content}}" alt="icon" height="50px" width="50px" ng-if="themeDetail.type == 'IMAGE'">
+				<a href="{{themeDetail.content}}" ng-if="themeDetail.type == 'LINK'">{{themeDetail.content}}</a>
+			</div>
+		</md-toolbar>
+		<br><br> 
+        <div ng-repeat="comment in comments">
+        	<div class="form-row">
+        		<hr style="border-style: inset;border-width: 1px;">
+        		<label>#1</label>
+				<div class="form-group col-sm-12">
+					<div class="form-group col-sm-2" ng-if="comment.deleted == false">
+						<label>Autor: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.author}} </label>  
+					</div>
+					<div class="form-group col-sm-2">
+						<label>Datum: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 22px"> {{comment.creatingDate}} </label> 
+					</div>
+					<div class="form-group col-sm-3" ng-if="comment.deleted == false">
+						<label>Tekst: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.text}} </label> 
+					</div>
+					<div class="form-group col-sm-1">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.likes}} &nbsp;<span class="glyphicon glyphicon-thumbs-up" style="font-size:large;"></span></label> 
+					</div>
+					<div class="form-group col-sm-1">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.dislikes}} &nbsp;<span class="glyphicon glyphicon-thumbs-down" style="font-size:large;"></span></label> 
+					</div>
+					<div class="form-group col-sm-1">
+						<a href="" ng-if="comment.changed == false"><span style="font-size: 40px;" class="glyphicon glyphicon-star-empty"></span></a>
+						<a href="" ng-if="comment.changed == true"><span style="font-size: 40px;" class="glyphicon glyphicon-star"></span></a>
+					</div> 
+				</div>
+				<hr style="border-style: inset;border-width: 1px;">
+			</div>
+			<!-- <div> <subcomment /></div> -->
+		</div>         
+	</div>
 </div>

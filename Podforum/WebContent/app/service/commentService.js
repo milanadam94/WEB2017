@@ -17,6 +17,10 @@ app.factory('commentFactory', function($http){
 		return $http.get('/Podforum/rest/comment/getSavedComments/' + username);
 	}
 	
+	factory.removeSavedComment = function(username, comment){
+		return $http.post('/Podforum/rest/comment/removeSavedComment/' + username, comment)
+	}
+	
 	factory.editComment = function(comment, oldCom){
 		return $http.post('/Podforum/rest/comment/editComment/' + oldCom, comment);
 	}
@@ -26,7 +30,7 @@ app.factory('commentFactory', function($http){
 	}
 	
 	factory.saveComment = function(username, comment){
-		return $http.post('/Podforum/rest/comment/saveComment/' + username, comment)
+		return $http.post('/Podforum/rest/comment/saveComment/' + username, comment);
 	}
 	
 	factory.likeComment = function(username, comment){
@@ -35,6 +39,22 @@ app.factory('commentFactory', function($http){
 	
 	factory.dislikeComment = function(username, comment){
 		return $http.post('/Podforum/rest/comment/dislikeComment/' + username, comment);
+	}
+	
+	factory.getLikedComments = function(username){
+		return $http.get('/Podforum/rest/comment/getLikedComments/' + username);
+	}
+	
+	factory.getDislikedComments = function(username){
+		return $http.get('/Podforum/rest/comment/getDislikedComments/' + username);
+	}
+	
+	factory.dislikeLikedComment = function(username, comment){
+		return $http.post('/Podforum/rest/comment/dislikeLikedComment/' + username, comment);
+	}
+	
+	factory.likeDislikedComment = function(username, comment){
+		return $http.post('/Podforum/rest/comment/likeDislikedComment/' + username, comment);
 	}
 	
 	return factory;

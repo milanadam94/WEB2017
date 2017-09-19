@@ -13,11 +13,13 @@
 	<nav class="navbar navbar-inverse">
   		<div class="container-fluid">
     		<div class="navbar-header">
-      			<a class="btn btn-second btn-lg" href="" ng-click="" ><span class="glyphicon glyphicon-home"></span>&nbsp;Pocetna</a>
+      			<a class="btn btn-second btn-lg" href="" ng-click="goToHomePage()" ><span class="glyphicon glyphicon-home"></span>&nbsp;Pocetna</a>
     		</div>
     		<ul class="nav navbar-nav">
       			<li><a href="" class="btn btn-primary btn-lg" ng-click="goToSubforum()"><span class="glyphicon glyphicon-th-list"></span>&nbsp;Podforumi</a></li>
       			<li><a href="" class="btn btn-second btn-lg" ng-click="goToInbox()"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Poruke</a></li>
+      			<li><a href="" class="btn btn-primary btn-lg" ng-click="goToLikeDislike()"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;<span class="glyphicon glyphicon-thumbs-down"></span>&nbsp;Like/Dislike</a></li>
+      			<li><a href="" class="btn btn-second btn-lg" ng-click="goToSaveEnt()"><span class="glyphicon glyphicon-save"></span>&nbsp;Sacuvani entiteti</a></li>
       			<li><a href="" class="btn btn-primary btn-lg" ng-click="editUser()" ng-if="isAdministrator()"><span class="glyphicon glyphicon-user"></span>&nbsp;Promena tipa</a></li>
     		</ul>
     		<ul class="nav navbar-nav navbar-right">
@@ -26,12 +28,31 @@
     	</div>
 	</nav>
 	<div ng-show="viewSubforum">
-		<div>
-			&nbsp;&nbsp;&nbsp;<button ng-if=!isUser() type="submit" class="btn btn-primary" ng-click="noviForum()"><span style="font-size:large;">Kreiranje foruma</span></button>
-			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="praceniPodforumi()"><span style="font-size:large;">Praceni podforumi</span></button>
+		<div align="center">
+			&nbsp;&nbsp;&nbsp;<button ng-if=!isUser() type="submit" class="btn btn-primary" ng-click="noviForum()"><span class="glyphicon glyphicon-plus" style="font-size:large;">&nbsp;Kreiranje podforuma</span></button>
+			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="praceniPodforumi()"><span class="glyphicon glyphicon-heart" style="font-size:large;">&nbsp;Praceni podforumi</span></button>
 		</div>
-		
-		<br>
+		<hr style="border-style: inset;border-width: 1px;">
+		<div class="row">
+			<div class="form-group col-sm-12">
+				<div class="form-group col-sm-3">
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> Naziv: </label> 
+						<input type = "text" class="form-control" ng-model="searchSub.name" placeholder="Unesite naziv">
+				</div>
+				<div class="form-group col-sm-3">
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> Opis: </label> 
+						<input type = "text" class="form-control" ng-model="searchSub.description" placeholder="Unesite opis">
+				</div>
+				<div class="form-group col-sm-3">
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> Odgovorni moderator: </label> 
+						<input type = "text" class="form-control" ng-model="searchSub.responsibleModerator" placeholder="Unesite odgovornog moderatora">
+				</div>
+				<div class="form-group col-sm-3">	
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> &nbsp;</label> 
+						<button type="submit" class="btn btn-primary btn-sm" ng-click="searchSubforum()"><span class="glyphicon glyphicon-search" style="font-size:large;"> Pretraga </span></button>                  
+				</div>
+			</div>
+		</div><hr style="border-style: inset;border-width: 1px;">
 		<div class="container">
 			<div class="row">
 				<div class="panel panel-default">
@@ -41,7 +62,7 @@
 						<table class="table table-striped" >
 				    		<thead>
 				      			<tr>
-				        			<th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Odgovorni moderator<th>Zaprati</th><th ng-if=!isUser()>Obrisi</th><th>Detalji</th>
+				        			<th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Odgovorni moderator<th>&nbsp;</th><th ng-if=!isUser()>&nbsp;</th><th>&nbsp;</th>
 				      			</tr>
 				     		</thead>
 				     		<tbody>
@@ -52,7 +73,7 @@
 						     		<td> {{ subforum.responibleModerator }} </td>
 						     		<td> <button type="submit" class="btn btn-info btn-sm" ng-click="followSub(subforum)"><span class="glyphicon glyphicon-heart" style="font-size:large;">&nbsp;Zaprati</span></button> </td>
 						     		<td ng-if=!isUser()> <button type="submit" class="btn btn-danger btn-sm" ng-click="deleteSub(subforum)"><span class="glyphicon glyphicon-trash" style="font-size:large;">&nbsp;Obrisi</span></button></td>
-						     		<td> <button type="submit" class="btn btn-success btn-sm" ng-click="details(subforum)"><span style="font-size:large;" class="glyphicon glyphicon-cog">&nbsp;Detalji</span></button> </td>
+						     		<td> <button type="submit" class="btn btn-success btn-sm" ng-click="details(subforum)"><span style="font-size:large;" class="glyphicon glyphicon-info-sign">&nbsp;Detalji</span></button> </td>
 						     	</tr>
 				     		</tbody>
 						</table>
@@ -62,27 +83,29 @@
 		</div>
 	</div>
 	<div ng-show="viewFollowedSubforums" class="container">
-			<div class="row">
+			<div class="row" ng-show="followedSubforumsView">
 				<div class="panel panel-default">
 					<div class="panel heading clearfix">
 						<label> Praceni podforumi: </label>
 					</div>
 						<table class="table table-striped">
 				    		<thead>
-                            	<tr><th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Otprati<th>Detalji</th></tr>
+                            	<tr><th>Naziv</th><th>Opis</th><th>Ikonica</th><th>Odgovorni moderator<th>&nbsp;<th>&nbsp;</th></tr>
                             </thead>
                             <tbody>
                                     	<tr ng-repeat="subforum in followedSubforums">
 				     		<td> {{ subforum.name }} </td>
 				     		<td> {{ subforum.description }} </td>
 				     		<td> <img ng-src="icons/{{subforum.iconPath}}" alt="ikonica" height="32px" width="32px"></td>
-				     		<td> <button type="submit" class="btn btn-danger" ng-click="unfollow(subforum)"><span style="font-size:large;">Otprati</span></button> </td>
-				     		<td> <button type="submit" class="btn btn-success" ng-click="details(subforum)"><span style="font-size:large;">Detalji</span></button> </td>
+				     		<td> {{ subforum.responibleModerator }} </td>
+				     		<td> <button type="submit" class="btn btn-danger" ng-click="unfollow(subforum)"><span class="glyphicon glyphicon-heart-empty" style="font-size:large;">&nbsp;Otprati</span></button> </td>
+				     		<td> <button type="submit" class="btn btn-success" ng-click="details(subforum)"><span class="glyphicon glyphicon-info-sign" style="font-size:large;">&nbsp;Detalji</span></button> </td>
 				     					</tr>
 				     		</tbody>
                          </table>
                  </div>
         	</div>
+        	<div>&nbsp;&nbsp;<label class="control-label" style="color: #B4886B; font-size: 25px"> {{ followSubforumsMessage }} </label></div>
 	</div>
 	<div ng-show="subforumDetails">
 		<md-toolbar>
@@ -94,7 +117,27 @@
 				
 			</div>
 		</md-toolbar>
-		<br>
+		<hr style="border-style: inset;border-width: 1px;">
+		<div class="row">
+			<div class="form-group col-sm-12">
+				<div class="form-group col-sm-3">
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> Naslov: </label> 
+						<input type = "text" class="form-control" ng-model="searchTheme.tag" placeholder="Unesite naslov">
+				</div>
+				<div class="form-group col-sm-3">
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> Sadrzaj: </label> 
+						<input type = "text" class="form-control" ng-model="searchTheme.content" placeholder="Unesite sadrzaj">
+				</div>
+				<div class="form-group col-sm-3">
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> Autor: </label> 
+						<input type = "text" class="form-control" ng-model="searchTheme.author" placeholder="Unesite autora">
+				</div>
+				<div class="form-group col-sm-3">	
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> &nbsp;</label> 
+						<button type="submit" class="btn btn-primary btn-sm" ng-click="searchTheme()"><span class="glyphicon glyphicon-search" style="font-size:large;"> Pretraga </span></button>                  
+				</div>
+			</div>
+		</div><hr style="border-style: inset;border-width: 1px;">
 		<div class="container">
 			<div class="row">
 				<div class="panel panel-default">
@@ -102,9 +145,9 @@
 						<label> Teme: </label>
 					</div>
 						<table class="table table-striped" >
-				    		<!-- <thead>
-                            	<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>Snimi</th><th>Izmeni</th><th>Obrisi</th><th>Like</th><th>Dislike</th></tr>
-                            </thead> -->
+				    		<thead>
+                            	<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+                            </thead>
                                     <tbody>
                                     	<tr ng-repeat="theme in themes">
                                     		<td> <a href="" ng-click="openTheme(theme)">{{ theme.name }}</a></td>
@@ -238,15 +281,15 @@
 	    <div class="form-group"  >
 	        <button type="submit"  value="Send" id="btnStartUpload" class="btn btn-primary" ng-click="uploadFile()" ng-disabled="!upload_button_state">
 	            <i class="icon-upload"></i>
-	            <span style="font-size:large;">Sacuvaj</span>
+	            <span style="font-size:large;" class="glyphicon glyphicon-save-file">&nbsp;Sacuvaj</span>
 	        </button>     
-	        <button type="submit" class="btn btn-second pull-right" ng-click="cancelSubforum()"><span style="font-size:large;"> Zatvori </span></button>                  
+	        <button type="submit" class="btn btn-primary pull-right" ng-click="cancelSubforum()"><span style="font-size:large;" class="glyphicon glyphicon-remove-sign">&nbsp;Zatvori</span></button>                  
 	    </div>   
 	</div>
 	
 	<div ng-show="viewInbox">		
-		<div>
-			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="novaPoruka()"><span style="font-size:large;">Nova poruka</span></button><br><br>
+		<div align="center">
+			&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary" ng-click="novaPoruka()"><span style="font-size:large;" class="glyphicon glyphicon-envelope">&nbsp;Nova poruka</span></button><br><br>
 		</div>
 		<div ng-show="showTableInbox">
 			<div class="container">
@@ -256,25 +299,25 @@
 						<label> Primljene poruke: </label>
 					</div>
 						<table class="table table-striped">
-				    <thead>
-				      <tr>
-				        <th>Pošiljalac</th><th>Poruka</th><th>Detalji</th><th>Odgovori</th>
-				      </tr>
-				     </thead>
-				     <tbody>
-				     	<tr ng-repeat="messageInbox in inbox">
-				     		<td > {{ messageInbox.sender }} </td>
-				     		<td ng-if="messageInbox.read == false" style="background:red" > {{ messageInbox.content }} </td>
-				     		<td ng-if="messageInbox.read == true" style="background:lightgreen" > {{ messageInbox.content }} </td>
-				     		<td> <button type="submit" class="btn btn-info" ng-click="detalji(messageInbox)"><span style="font-size:large;">Detalji</span></button> </td>
-				     		<td> <button type="submit" class="btn btn-warning" ng-click="odgovori(messageInbox)"><span style="font-size:large;">Odgovori</span></button></td>
-				     </tbody>
+						    <thead>
+						      <tr>
+						        <th>Pošiljalac</th><th>Poruka</th><th>&nbsp;</th><th>&nbsp;</th>
+						      </tr>
+						     </thead>
+						     <tbody>
+						     	<tr ng-repeat="messageInbox in inbox">
+						     		<td > {{ messageInbox.sender }} </td>
+						     		<td ng-if="messageInbox.read == false" style="background:red" > {{ messageInbox.content }} </td>
+						     		<td ng-if="messageInbox.read == true" style="background:lightgreen" > {{ messageInbox.content }} </td>
+						     		<td> <button type="submit" class="btn btn-info" ng-click="detalji(messageInbox)"><span style="font-size:large;" class="glyphicon glyphicon-info-sign">&nbsp;Detalji</span></button> </td>
+						     		<td> <button type="submit" class="btn btn-warning" ng-click="odgovori(messageInbox)"><span style="font-size:large;" class="glyphicon glyphicon-send">&nbsp;Odgovori</span></button></td>
+						     </tbody>
 						</table>
 				</div>
 			</div>  
 			</div>
-		<div class="form-group text-danger" ng-if="emptyInbox">{{ emptyInbox }}</div>
 		</div>
+		<div>&nbsp;&nbsp;<label class="control-label" style="color: #B4886B; font-size: 25px"> {{ emptyInbox }} </label></div>
 	</div>
 	<div ng-show="newMessage" id="newMessage">
 		<div class="form-group">
@@ -286,11 +329,24 @@
 			<textarea rows="4" cols="50" class="form-control" ng-model="content" ng-disabled="contentDisabled" placeholder="Unesite sadrzaj poruke"></textarea>
 		</div>
 		<div class="form-group">	
-			<button type="submit" class="btn btn-primary" ng-click="send()" ng-show="posaljiDugme"> <span style="font-size:large;">Posalji </span></button>
-			<button type="submit" class="btn btn-second pull-right" ng-click="cancel()"> <span style="font-size:large;">Zatvori </span></button>
+			<button type="submit" class="btn btn-primary" ng-click="send()" ng-show="posaljiDugme"> <span style="font-size:large;" class="glyphicon glyphicon-send">&nbsp;Posalji</span></button>
+			<button type="submit" class="btn btn-primary pull-right" ng-click="cancel()"> <span style="font-size:large;" class="glyphicon glyphicon-remove-sign">&nbsp;Zatvori</span></button>
 		</div>
 	</div>	
 	<div ng-show="editProfile">
+		<hr style="border-style: inset;border-width: 1px;">
+		<div class="row">
+			<div class="form-group col-sm-10">
+				<div class="form-group col-sm-7">
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> Korisnicko ime: </label> 
+						<input type = "text" class="form-control" ng-model="searchUsername" placeholder="Unesite korisnicko ime">
+				</div>
+				<div class="form-group col-sm-3">	
+						<label class="control-label" style="color: #B4886B; font-size: 20px"> &nbsp;</label> 
+						<button type="submit" class="btn btn-primary btn-sm" ng-click="searchUsers()"><span class="glyphicon glyphicon-search" style="font-size:large;"> Pretraga </span></button>                  
+				</div>
+			</div>
+		</div><hr style="border-style: inset;border-width: 1px;">
 		<div class="container">
 			<div class="row">
 				<div class="panel panel-default">
@@ -300,7 +356,7 @@
 						<table class="table table-striped">
 				    <thead>
 				      <tr>
-				        <th>Korisničko ime</th><th>Ime</th><th>Prezime</th><th>Email</th><th>Uloga</th><th>Izmena</th>
+				        <th>Korisničko ime</th><th>Ime</th><th>Prezime</th><th>Email</th><th>Uloga</th><th>&nbsp;</th>
 				      </tr>
 				     </thead>
 				     <tbody>
@@ -310,7 +366,7 @@
 				     		<td> {{ user.surname }}</td>
 				     		<td> {{ user.email }}</td>
 				     		<td> {{ user.role }}</td>
-				     		<td> <button type="submit" class="btn btn-info" data-toggle="modal" data-target="#profileModal" ng-click="editRole(user)"><span style="font-size:large;">Izmeni</span></button>  </td>
+				     		<td> <button type="submit" class="btn btn-info" data-toggle="modal" data-target="#profileModal" ng-click="editRole(user)"><span style="font-size:large;" class="glyphicon glyphicon-user">&nbsp;Izmeni</span></button>  </td>
 				     </tbody>
 						</table>
 				</div> 
@@ -318,6 +374,252 @@
 		</div>
 	</div>
 	
+	<div ng-show="viewLikeDislike">
+		<div class="container" ng-show="likedThemesTable">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Teme sa pozitivnim glasom: </label>
+					</div>
+						<table class="table table-striped" >
+									<thead>
+                            			<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+                            		</thead>
+                                    <tbody>
+                                    	<tr ng-repeat="theme in likedThemes">
+                                    		<td> {{ theme.name }} </td>
+                                    		<td ng-if="theme.type == 'TEXT'"> {{ theme.content }} </td>
+                                    		<td ng-if="theme.type == 'LINK'"> <a href="{{theme.content}}">{{theme.content}}</a> </td>
+                                    		<td ng-if="theme.type == 'IMAGE'"> <img alt="ikonica" src="{{theme.content}}" height="50px" width="50px"> </td>
+                                    		<td> {{ theme.author }} </td>
+                                    		<td> {{ theme.creatingDate }} </td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.likes}} </label>&nbsp;
+                                    			<button type="submit" class="btn btn-primary" ng-click="dislikeLiked(theme)"><span style="font-size:large;" class="glyphicon glyphicon-thumbs-up">&nbsp;Like</span></button> 	
+                                    		</td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.dislikes}} &nbsp;<span style="font-size:large;" class="glyphicon glyphicon-thumbs-down"></span> </label>
+                                    		</td>
+                                    	</tr>
+                                    </tbody>
+                         </table>
+                 </div>
+          	</div>
+       	</div>
+       	<div>&nbsp;&nbsp;<label class="control-label" style="color: #B4886B; font-size: 25px"> {{ likedThemesMessage }} </label></div>
+	
+		<div class="container" ng-show="dislikedThemesTable">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Teme sa negativnim glasom: </label>
+					</div>
+						<table class="table table-striped" >
+									<thead>
+                            			<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+                            		</thead>
+                                    <tbody>
+                                    	<tr ng-repeat="theme in dislikedThemes">
+                                    		<td> {{ theme.name }} </td>
+                                    		<td ng-if="theme.type == 'TEXT'"> {{ theme.content }} </td>
+                                    		<td ng-if="theme.type == 'LINK'"> <a href="{{theme.content}}">{{theme.content}}</a> </td>
+                                    		<td ng-if="theme.type == 'IMAGE'"> <img alt="ikonica" src="{{theme.content}}" height="50px" width="50px"> </td>
+                                    		<td> {{ theme.author }} </td>
+                                    		<td> {{ theme.creatingDate }} </td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.likes}}&nbsp;<span style="font-size:large;" class="glyphicon glyphicon-thumbs-up"></span></label>
+                                    		</td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.dislikes}} </label>&nbsp;
+                                    			<button type="submit" class="btn btn-primary" ng-click="likeDisliked(theme)"><span style="font-size:large;" class="glyphicon glyphicon-thumbs-down">&nbsp;Dislike</span></button> 	
+                                    		</td>
+                                    	</tr>
+                                    </tbody>
+                         </table>
+                 </div>
+          	</div>
+       	</div>
+       	<div>&nbsp;&nbsp;<label class="control-label" style="color: #B4886B; font-size: 25px"> {{ dislikedThemesMessage }} </label></div>
+		
+		<div>&nbsp;&nbsp;<label class="control-label" style="color: #B4886B; font-size: 25px"> {{ likedCommentsMessage }} </label></div>
+		<div ng-repeat="comment in likedComments">
+        	<div class="form-row">
+        		<hr style="border-style: inset;border-width: 1px;">
+				<div class="form-group col-sm-12">
+					<div class="form-group col-sm-2" ng-if="comment.deleted == false">
+						<label>Autor: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.author}} </label>  
+					</div>
+					<div class="form-group col-sm-2">
+						<label>Datum: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 22px"> {{comment.creatingDate}} </label> 
+					</div>
+					<div class="form-group col-sm-3" ng-if="comment.deleted == false">
+						<label>Tekst: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.text}} </label> 
+					</div>
+					<div class="form-group col-sm-2">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.likes}} </label> 
+						<button type="button" class="btn btn-primary btn-sm" ng-click="dislikeLikedCom(comment)"><span class="glyphicon glyphicon-thumbs-up" style="font-size:large;">&nbsp;Like</span></button>
+					</div>
+					<div class="form-group col-sm-2">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.dislikes}} &nbsp;<span class="glyphicon glyphicon-thumbs-down" style="font-size:large;"></span></label> 
+					</div>
+					<div class="form-group col-sm-1">
+						<a href="" ng-if="comment.changed == false"><span style="font-size: 40px;" class="glyphicon glyphicon-star-empty"></span></a>
+						<a href="" ng-if="comment.changed == true"><span style="font-size: 40px;" class="glyphicon glyphicon-star"></span></a>
+					</div> 
+				</div>
+				<hr style="border-style: inset;border-width: 1px;">
+			</div>
+			<!-- <div> <subcomment /></div>  -->
+		</div> 
+		<div>&nbsp;&nbsp;<label class="control-label" style="color: #B4886B; font-size: 25px"> {{ dislikedCommentsMessage }} </label></div>
+		<div ng-repeat="comment in dislikedComments">
+        	<div class="form-row">
+        		<hr style="border-style: inset;border-width: 1px;">
+				<div class="form-group col-sm-12">
+					<div class="form-group col-sm-2" ng-if="comment.deleted == false">
+						<label>Autor: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.author}} </label>  
+					</div>
+					<div class="form-group col-sm-2">
+						<label>Datum: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 22px"> {{comment.creatingDate}} </label> 
+					</div>
+					<div class="form-group col-sm-3" ng-if="comment.deleted == false">
+						<label>Tekst: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.text}} </label> 
+					</div>
+					<div class="form-group col-sm-2">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.likes}}&nbsp;<span class="glyphicon glyphicon-thumbs-up" style="font-size:large;"></span></label> 
+					</div>
+					<div class="form-group col-sm-2">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.dislikes}}</label> 
+						<button type="button" class="btn btn-primary btn-sm" ng-click="likeDislikedCom(comment)"><span class="glyphicon glyphicon-thumbs-down" style="font-size:large;">&nbsp;Dislike</span></button>
+					</div>
+					<div class="form-group col-sm-1">
+						<a href="" ng-if="comment.changed == false"><span style="font-size: 40px;" class="glyphicon glyphicon-star-empty"></span></a>
+						<a href="" ng-if="comment.changed == true"><span style="font-size: 40px;" class="glyphicon glyphicon-star"></span></a>
+					</div> 
+				</div>
+				<hr style="border-style: inset;border-width: 1px;">
+			</div>
+			<!-- <div> <subcomment /></div>  -->
+		</div> 
+		
+	</div>
+	
+	<div ng-show="viewSaveEnt">
+		<div class="container" ng-show="savedThemesTable">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Sacuvane teme: </label>
+					</div>
+						<table class="table table-striped" >
+									<thead>
+                            			<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>Podforum</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+                            		</thead>
+                                    <tbody>
+                                    	<tr ng-repeat="theme in savedThemes">
+                                    		<td> {{ theme.name }} </td>
+                                    		<td ng-if="theme.type == 'TEXT'"> {{ theme.content }} </td>
+                                    		<td ng-if="theme.type == 'LINK'"> <a href="{{theme.content}}">{{theme.content}}</a> </td>
+                                    		<td ng-if="theme.type == 'IMAGE'"> <img alt="ikonica" src="{{theme.content}}" height="50px" width="50px"> </td>
+                                    		<td> {{ theme.author }} </td>
+                                    		<td> {{ theme.creatingDate }} </td>
+                                    		<td> {{ theme.subforum.name }} </td>
+                                    		<td> <button type="submit" class="btn btn-danger" ng-click="removeSavedTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-trash">&nbsp;Obrisi</span></button> </td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.likes}} &nbsp;<span style="font-size:large;" class="glyphicon glyphicon-thumbs-up"></span></label>
+                                    		</td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.dislikes}} &nbsp;<span style="font-size:large;" class="glyphicon glyphicon-thumbs-down"></span> </label>
+                                    		</td>
+                                    	</tr>
+                                    </tbody>
+                         </table>
+                 </div>
+          	</div>
+       	</div>
+       	<div>&nbsp;&nbsp;<label class="control-label" style="color: #B4886B; font-size: 25px"> {{ savedThemesMessage }} </label></div>
+		
+		<div>&nbsp;&nbsp;<label class="control-label" style="color: #B4886B; font-size: 25px"> {{ savedCommentsMessage }} </label></div>
+		<div ng-repeat="comment in savedComments">
+        	<div class="form-row">
+        		<hr style="border-style: inset;border-width: 1px;">
+				<div class="form-group col-sm-12">
+					<div class="form-group col-sm-2" ng-if="comment.deleted == false">
+						<label>Autor: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.author}} </label>  
+					</div>
+					<div class="form-group col-sm-2">
+						<label>Datum: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 22px"> {{comment.creatingDate}} </label> 
+					</div>
+					<div class="form-group col-sm-3" ng-if="comment.deleted == false">
+						<label>Tekst: </label>
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.text}} </label> 
+					</div>
+					<div class="form-group col-sm-2">
+						<button type="submit" class="btn btn-danger" ng-click="removeSavedComment(comment)"><span style="font-size:large;" class="glyphicon glyphicon-trash">&nbsp;Obrisi</span></button>
+					</div>
+					<div class="form-group col-sm-1">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.likes}} &nbsp;<span class="glyphicon glyphicon-thumbs-up" style="font-size:large;"></span></label> 
+					</div>
+					<div class="form-group col-sm-1">
+						<label class="control-label" style="color: #B4886B; font-size: 25px"> {{comment.dislikes}} &nbsp;<span class="glyphicon glyphicon-thumbs-down" style="font-size:large;"></span></label> 
+					</div>
+					<div class="form-group col-sm-1">
+						<a href="" ng-if="comment.changed == false"><span style="font-size: 40px;" class="glyphicon glyphicon-star-empty"></span></a>
+						<a href="" ng-if="comment.changed == true"><span style="font-size: 40px;" class="glyphicon glyphicon-star"></span></a>
+					</div> 
+				</div>
+				<hr style="border-style: inset;border-width: 1px;">
+			</div>
+			<!-- <div> <subcomment /></div>  -->
+		</div> 
+	</div>
+	
+	<div ng-show="viewHome">
+		<div class="container">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel heading clearfix">
+						<label> Teme iz podforuma koje pratite: </label>
+					</div>
+						<table class="table table-striped" >
+				    		<thead>
+                            	<tr><th>Naslov</th><th>Sadrzaj</th><th>Autor</th><th>Datum kreiranja</th><th>Podforum</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+                            </thead>
+                                    <tbody>
+                                    	<tr ng-repeat="theme in themesOfFollowedSubforums">
+                                    		<td> {{ theme.name }}</td>
+                                    		<td ng-if="theme.type == 'TEXT'"> {{ theme.content }} </td>
+                                    		<td ng-if="theme.type == 'LINK'"> <a href="{{theme.content}}">{{theme.content}}</a> </td>
+                                    		<td ng-if="theme.type == 'IMAGE'"> <img alt="ikonica" src="{{theme.content}}" height="50px" width="50px"> </td>
+                                    		<td> {{ theme.author }} </td>
+                                    		<td> {{ theme.creatingDate }} </td>
+                                    		<td> {{ theme.subforum.name }} </td>
+                                    		<td> <button type="submit" class="btn btn-success" ng-click="saveTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-save">&nbsp;Snimi</span></button> </td>
+                                    		<td> <button type="submit" class="btn btn-warning" ng-click="editTheme(theme)" data-toggle="modal" data-target="#editThemeModal"><span style="font-size:large;" class="glyphicon glyphicon-edit">&nbsp;Izmeni</span></button> </td>
+                                    		<td> <button type="submit" class="btn btn-danger" ng-click="deleteTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-trash">&nbsp;Obrisi</span></button> </td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.likes}} </label>&nbsp;
+                                    			<button type="submit" class="btn btn-primary" ng-click="likeTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-thumbs-up">&nbsp;Like</span></button> 	
+                                    		</td>
+                                    		<td> 
+                                    			<label class="control-label" style="color: #B4886B; font-size: 25px"> {{theme.dislikes}} </label>&nbsp;
+                                    			<button type="submit" class="btn btn-default" ng-click="dislikeTheme(theme)"><span style="font-size:large;" class="glyphicon glyphicon-thumbs-down">&nbsp;Dislike</span></button> 
+                                    		</td>
+                                    	</tr>
+                                    </tbody>
+                         </table>
+                 </div>
+          	</div>
+       	</div>
+	</div>
 	<div id="newThemeModal" class="modal fade" role="dialog">
 			<div class="modal-dialog">
 				<div class="modal-content">

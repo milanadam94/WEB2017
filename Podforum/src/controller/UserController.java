@@ -81,4 +81,18 @@ public class UserController {
 		}
 		return sendUsers;
 	}
+	
+	@GET
+	@Path("/search/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<User> search(@PathParam(value="username") String username) throws FileNotFoundException, IOException{
+		ArrayList<User> users = UserFileController.readUser(config);
+		ArrayList<User> retUsers = new ArrayList<User>();
+		for(int i = 0; i < users.size(); i++){
+			if(users.get(i).getUsername().startsWith(username)){
+				retUsers.add(users.get(i));
+			}
+		}
+		return retUsers;
+	}
 }

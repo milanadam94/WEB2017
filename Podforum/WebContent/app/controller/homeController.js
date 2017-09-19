@@ -1,9 +1,11 @@
-app.controller('homeController', ['$scope', '$location', '$cookies', 'subforumFactory', 'themeFactory', function($scope, $location, $cookies, subforumFactory, themeFactory){
+app.controller('homeController', ['$scope', '$location', '$cookies', 'subforumFactory', 'themeFactory', 'commentFactory', function($scope, $location, $cookies, subforumFactory, themeFactory, commentFactory){
 
 	$scope.subforums = [];
 	$scope.themes = [];
+	$scope.comments = [];
 	
 	$scope.subforumDetail = null;
+	$scope.themeDetail = null;
 	
 	$scope.viewSubforum = true;
 	$scope.subforumDetails = false;
@@ -17,6 +19,13 @@ app.controller('homeController', ['$scope', '$location', '$cookies', 'subforumFa
 		$scope.subforumDetail = subforum;
 		themeFactory.getThemes(subforum.name).success(function(data){
 			$scope.themes = data;
+		});
+	}
+	$scope.openTheme = function(theme){
+		$scope.themeDetails = true;
+		$scope.themeDetail = theme;
+		commentFactory.getComments(theme.name).success(function(data){
+			$scope.comments = data;
 		});
 	}
 	$scope.login = function(){

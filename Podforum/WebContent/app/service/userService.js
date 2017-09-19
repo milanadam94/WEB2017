@@ -20,5 +20,9 @@ app.factory('userFactory', function($http){
 		return $http.post('/Podforum/rest/user/changeRole/' + username + '/' + role);
 	}
  
+	factory.search = function(username) {
+		return $http.get('/Podforum/rest/user/search/'+username);
+	}
+	
 	return factory;
 });
